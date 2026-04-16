@@ -2,7 +2,7 @@
 
 A beginner-friendly, comprehensive interactive guide to AI and Generative AI — covering models, agents, protocols (MCP, A2A), coding agents, personal agents, context engineering, the full landscape, and two high-leverage career paths for software engineers.
 
-👉 **Live site:https://veeragoni.github.io/ai-foundations/
+👉 **Live site: https://veeragoni.github.io/ai-foundations/
 
 ## What's inside
 
