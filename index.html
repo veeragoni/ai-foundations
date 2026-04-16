@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Foundations — From Models to Agents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,500&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0b0f14;--bg2:#101620;--bg3:#151d2a;--surface:#1a2332;--surface2:#1f2b3d;--surface3:#253448;
+  --border:rgba(120,180,255,0.1);--border2:rgba(120,180,255,0.2);
+  --accent:#f0a040;--accent2:#ffc470;--blue:#5599ff;--blue2:#88bbff;--cyan:#40d8d0;
+  --green:#50d880;--purple:#a080ff;--pink:#ff6090;--red:#ff5050;
+  --text:#dce4f0;--text2:#8899b0;--text3:#506070;
+  --glow-a:rgba(240,160,64,0.12);--glow-b:rgba(85,153,255,0.12);--glow-c:rgba(64,216,208,0.12);
+  --glow-g:rgba(80,216,128,0.12);--glow-p:rgba(160,128,255,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-feature-settings:"kern","liga","calt";-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden}
+
+.progress-bar{position:fixed;top:0;left:0;height:3px;z-index:1000;background:linear-gradient(90deg,var(--accent),var(--blue),var(--cyan),var(--green));width:0%;transition:width .15s}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(11,15,20,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 1.5rem}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:1rem;height:52px;overflow-x:auto}
+.nav-logo{font-family:'Fraunces',serif;font-weight:700;font-size:1rem;color:var(--accent);white-space:nowrap;letter-spacing:-0.02em;flex-shrink:0}
+.nav-logo span{color:var(--text3);font-weight:300;font-size:0.8rem;margin-left:0.3rem}
+.nav-links{display:flex;gap:0.15rem;flex-shrink:0}
+.nav-links a{font-size:0.65rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);text-decoration:none;padding:0.3rem 0.5rem;border-radius:5px;white-space:nowrap;transition:all .2s;cursor:pointer}
+.nav-links a:hover,.nav-links a.active{color:var(--accent);background:var(--glow-a)}
+
+.container{max-width:900px;margin:0 auto;padding:0 1.5rem}
+
+.hero{padding:7rem 0 3.5rem;text-align:center;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(240,160,64,0.06),transparent)}
+.hero-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:0.65rem;font-weight:500;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.7rem;border:1px solid rgba(240,160,64,0.25);border-radius:20px;margin-bottom:1.2rem;background:rgba(240,160,64,0.06)}
+.hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,5vw,3.2rem);line-height:1.15;letter-spacing:-0.03em;margin-bottom:.8rem}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p{font-size:1rem;color:var(--text2);max-width:600px;margin:0 auto;line-height:1.7}
+
+.roadmap{display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap;margin:2rem auto 0;max-width:750px}
+.roadmap-step{display:flex;align-items:center;gap:0.35rem;font-size:0.65rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;padding:0.35rem 0.65rem;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;transition:all .25s}
+.roadmap-step:hover{border-color:var(--border2);color:var(--text);background:var(--surface)}
+.roadmap-step .rs-num{font-family:'JetBrains Mono',monospace;font-size:0.55rem;background:var(--surface2);padding:0.12rem 0.3rem;border-radius:3px;color:var(--text3)}
+
+.section{padding:3.5rem 0 2rem;border-top:1px solid var(--border);scroll-margin-top:64px}
+.section-tag{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:500;margin-bottom:0.5rem}
+.section h2{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(1.5rem,3vw,2rem);line-height:1.2;letter-spacing:-0.02em;margin-bottom:.4rem}
+.section .lead{font-size:.95rem;color:var(--text2);max-width:640px;margin-bottom:1.5rem;line-height:1.7}
+.section h3.sub{font-family:'Fraunces',serif;margin:2rem 0 .8rem;font-size:1.1rem}
+
+.card-grid{display:grid;gap:.8rem;margin:1.2rem 0}
+.card-grid.cols-2{grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.card-grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:1.3rem;transition:all .3s}
+.card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.card-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:.6rem}
+.card h3{font-family:'Fraunces',serif;font-weight:600;font-size:1rem;margin-bottom:.3rem;letter-spacing:-0.01em}
+.card h3 a{color:inherit;text-decoration:none;border-bottom:1px dashed rgba(120,180,255,0.25);transition:all .2s}
+.card h3 a:hover{border-bottom-color:var(--accent);color:var(--accent)}
+.card p a,.comp-table td a,.callout p a,.lead a{color:var(--accent2);text-decoration:none;border-bottom:1px dashed rgba(240,160,64,0.3);transition:all .2s}
+.card p a:hover,.comp-table td a:hover,.callout p a:hover,.lead a:hover{border-bottom-color:var(--accent);color:var(--accent)}
+.card .tag a{color:inherit;text-decoration:none;border-bottom:1px dotted currentColor;opacity:0.9;transition:all .2s}
+.card .tag a:hover{opacity:1;border-bottom-style:solid}
+.card p{color:var(--text2);font-size:.83rem;line-height:1.6}
+.card .tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:0.05em;text-transform:uppercase;padding:0.18rem 0.45rem;border-radius:4px;margin-top:.5rem}
+.card.amber{border-left:3px solid var(--accent)}.card.amber .card-icon{background:var(--glow-a);color:var(--accent)}.card.amber .tag{background:var(--glow-a);color:var(--accent)}
+.card.blue{border-left:3px solid var(--blue)}.card.blue .card-icon{background:var(--glow-b);color:var(--blue)}.card.blue .tag{background:var(--glow-b);color:var(--blue)}
+.card.cyan{border-left:3px solid var(--cyan)}.card.cyan .card-icon{background:var(--glow-c);color:var(--cyan)}.card.cyan .tag{background:var(--glow-c);color:var(--cyan)}
+.card.green{border-left:3px solid var(--green)}.card.green .card-icon{background:var(--glow-g);color:var(--green)}.card.green .tag{background:var(--glow-g);color:var(--green)}
+.card.purple{border-left:3px solid var(--purple)}.card.purple .card-icon{background:var(--glow-p);color:var(--purple)}.card.purple .tag{background:var(--glow-p);color:var(--purple)}
+
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin:1.2rem 0;overflow-x:auto}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.8rem}
+.h-flow{display:flex;align-items:center;gap:.25rem;flex-wrap:wrap;justify-content:center}
+.h-flow .node{padding:.5rem .8rem;border-radius:8px;font-size:.73rem;font-weight:600;text-align:center;border:1px solid var(--border);background:var(--surface);min-width:80px;transition:all .3s}
+.h-flow .node:hover{transform:scale(1.03)}
+.h-flow .arrow{color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:.85rem;flex-shrink:0}
+.h-flow .node.highlight{border-color:var(--accent);background:linear-gradient(135deg,rgba(240,160,64,0.12),rgba(240,160,64,0.04));box-shadow:0 0 16px rgba(240,160,64,0.08)}
+.h-flow .node.blue-hl{border-color:var(--blue);background:linear-gradient(135deg,rgba(85,153,255,0.12),rgba(85,153,255,0.04))}
+.h-flow .node.cyan-hl{border-color:var(--cyan);background:linear-gradient(135deg,rgba(64,216,208,0.12),rgba(64,216,208,0.04))}
+.h-flow .node.green-hl{border-color:var(--green);background:linear-gradient(135deg,rgba(80,216,128,0.12),rgba(80,216,128,0.04))}
+.h-flow .node.purple-hl{border-color:var(--purple);background:linear-gradient(135deg,rgba(160,128,255,0.12),rgba(160,128,255,0.04))}
+
+.agent-loop{display:flex;flex-direction:column;align-items:center;gap:0;padding:.8rem 0}
+.al-row{display:flex;align-items:center;gap:.8rem;position:relative;z-index:2}
+.al-box{padding:.6rem 1rem;border-radius:9px;font-size:.78rem;font-weight:600;text-align:center;border:1.5px solid;min-width:120px}
+.al-box small{display:block;font-weight:400;font-size:.65rem;color:var(--text2);margin-top:.15rem}
+.al-arrow{text-align:center;color:var(--text3);font-size:1.1rem;padding:.15rem 0}
+.al-feedback{position:absolute;right:-115px;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--text3);letter-spacing:.06em;border:1px dashed var(--border);padding:.25rem .5rem;border-radius:5px;white-space:nowrap}
+
+.comp-table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.78rem}
+.comp-table th{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--border2)}
+.comp-table td{padding:.5rem .7rem;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.comp-table tr:hover td{background:rgba(255,255,255,0.02)}
+.comp-table .label{font-weight:600;color:var(--text);white-space:nowrap}
+
+.callout{background:var(--bg2);border-radius:11px;border:1px solid var(--border);padding:1rem 1.3rem;margin:1.2rem 0}
+.callout.amber{border-left:3px solid var(--accent)}.callout.blue{border-left:3px solid var(--blue)}.callout.cyan{border-left:3px solid var(--cyan)}.callout.green{border-left:3px solid var(--green)}.callout.purple{border-left:3px solid var(--purple)}
+.callout .callout-title{font-family:'Fraunces',serif;font-weight:600;font-size:.9rem;margin-bottom:.25rem}
+.callout p{font-size:.82rem;color:var(--text2);line-height:1.6}
+
+.key-points{display:flex;flex-direction:column;gap:.5rem;margin:1.2rem 0}
+.kp{display:flex;gap:.7rem;align-items:flex-start;padding:.7rem .9rem;border-radius:9px;background:var(--surface);border:1px solid var(--border);transition:all .2s}
+.kp:hover{border-color:var(--border2)}
+.kp-num{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;color:var(--accent);min-width:1.6rem;padding-top:.12rem}
+.kp-content{flex:1}
+.kp-content strong{color:var(--text);font-weight:600}
+.kp-content p{font-size:.82rem;color:var(--text2);margin-top:.12rem}
+
+.tabs{display:flex;gap:.25rem;margin-bottom:.8rem;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab-btn{font-family:'JetBrains Mono',monospace;font-size:.63rem;letter-spacing:.05em;text-transform:uppercase;background:none;border:none;color:var(--text3);padding:.4rem .7rem;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab-btn:hover{color:var(--text2)}.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* ── MCP Visual ── */
+.mcp-arch{display:flex;align-items:stretch;gap:.6rem;margin:1rem 0;flex-wrap:wrap;justify-content:center}
+.mcp-col{flex:1;min-width:140px;max-width:220px;display:flex;flex-direction:column;gap:.4rem}
+.mcp-box{padding:.6rem .8rem;border-radius:8px;font-size:.72rem;text-align:center;border:1.5px solid;flex:1;display:flex;flex-direction:column;justify-content:center}
+.mcp-box strong{display:block;font-size:.78rem;margin-bottom:.15rem}
+.mcp-box small{font-size:.62rem;color:var(--text2);line-height:1.4}
+.mcp-connector{display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text3);min-width:30px}
+
+/* ── Flashcard ── */
+.flashcard-deck{margin:1.5rem 0;text-align:center}
+.flashcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.8rem 1.5rem 1.2rem;max-width:520px;margin:0 auto;cursor:pointer;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .3s;position:relative;user-select:none}
+.flashcard:hover{border-color:var(--border2)}
+.flashcard .fc-label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;position:absolute;top:.7rem;left:.9rem}
+.flashcard .fc-q{color:var(--accent)}.flashcard .fc-a{color:var(--green)}
+.flashcard .fc-text{font-size:.98rem;line-height:1.6;max-width:440px}
+.flashcard .fc-text.answer{color:var(--text2);font-size:.88rem}
+.flashcard .fc-hint{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--text3);position:absolute;bottom:.5rem;letter-spacing:.05em}
+.fc-nav{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-top:.7rem}
+.fc-nav button{background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:.35rem .7rem;border-radius:7px;cursor:pointer;font-size:.78rem;transition:all .2s;font-family:'Instrument Sans',sans-serif}
+.fc-nav button:hover{border-color:var(--border2);color:var(--text)}
+.fc-counter{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3)}
+
+/* ── Learning Path ── */
+.lp-track{display:flex;flex-direction:column;gap:.6rem;margin:.8rem 0}
+.lp-item{display:flex;gap:.8rem;align-items:flex-start;padding:.9rem 1rem;border-radius:10px;background:var(--surface);border:1px solid var(--border);transition:all .25s}
+.lp-item:hover{border-color:var(--border2);transform:translateX(3px)}
+.lp-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.lp-meta{flex:1}
+.lp-meta h4{font-weight:600;font-size:.85rem;margin-bottom:.1rem}
+.lp-meta h4 a{color:var(--text);text-decoration:none;border-bottom:1px dashed var(--border2);transition:all .2s}
+.lp-meta h4 a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.lp-meta p{font-size:.78rem;color:var(--text2);line-height:1.5}
+.lp-meta .lp-tags{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.35rem}
+.lp-meta .lp-tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.04em;text-transform:uppercase;padding:.12rem .4rem;border-radius:3px;background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+
+/* ── Glossary ── */
+.glossary{columns:2;column-gap:1.2rem;margin:1.2rem 0}
+.glossary-item{break-inside:avoid;margin-bottom:.6rem;padding:.5rem .7rem;border-radius:7px;background:var(--surface);border:1px solid var(--border)}
+.glossary-item dt{font-weight:600;font-size:.8rem;color:var(--accent);margin-bottom:.1rem}
+.glossary-item dd{font-size:.73rem;color:var(--text2);line-height:1.5}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 0;text-align:center;font-size:.7rem;color:var(--text3);margin-top:1.5rem}
+.fade-in{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* Evolving badge */
+.evolving{display:inline-flex;align-items:center;gap:.3rem;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan);padding:.2rem .5rem;border:1px solid rgba(64,216,208,0.2);border-radius:4px;background:rgba(64,216,208,0.06);margin-left:.3rem;vertical-align:middle}
+.evolving::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+@media(max-width:768px){
+  .nav-links{display:none}.hero{padding:5.5rem 0 2.5rem}
+  .card-grid.cols-2,.card-grid.cols-3{grid-template-columns:1fr}
+  .glossary{columns:1}.al-feedback{display:none}
+  .h-flow{gap:.2rem}.h-flow .node{min-width:65px;font-size:.65rem;padding:.4rem .5rem}
+  .mcp-arch{flex-direction:column;align-items:center}.mcp-col{max-width:100%;min-width:0}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+<div class="nav-inner">
+<div class="nav-logo">AI Foundations <span>v2.2</span></div>
+<div class="nav-links">
+<a href="#what-is-ai" onclick="return navTo('what-is-ai')">Start</a>
+<a href="#models" onclick="return navTo('models')">Models</a>
+<a href="#how-built" onclick="return navTo('how-built')">Built</a>
+<a href="#limitations" onclick="return navTo('limitations')">Limits</a>
+<a href="#agents" onclick="return navTo('agents')">Agents</a>
+<a href="#mcp" onclick="return navTo('mcp')">MCP</a>
+<a href="#a2a" onclick="return navTo('a2a')">A2A</a>
+<a href="#context-eng" onclick="return navTo('context-eng')">Context</a>
+<a href="#coding-agents" onclick="return navTo('coding-agents')">Code</a>
+<a href="#personal-agents" onclick="return navTo('personal-agents')">Personal</a>
+<a href="#tools" onclick="return navTo('tools')">Toolkit</a>
+<a href="#learn" onclick="return navTo('learn')">Learn</a>
+<a href="#for-engineers" onclick="return navTo('for-engineers')">Engineers</a>
+<a href="#future" onclick="return navTo('future')">Future</a>
+<a href="#flashcards" onclick="return navTo('flashcards')">Quiz</a>
+</div>
+</div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<header class="hero container" id="top">
+<div class="hero-badge">Beginner-Friendly · 16 Sections · Comprehensive</div>
+<h1>From <em>Language Models</em><br>to <em>Autonomous Agents</em></h1>
+<p>A structured guide for anyone starting with AI and Generative AI — what models are, how they work, their limits, how they become agents, the protocols connecting them, and where to start learning.</p>
+<div class="roadmap">
+<div class="roadmap-step" onclick="navTo('what-is-ai')"><span class="rs-num">01</span>AI Basics</div>
+<div class="roadmap-step" onclick="navTo('models')"><span class="rs-num">02</span>Model Types</div>
+<div class="roadmap-step" onclick="navTo('how-built')"><span class="rs-num">03</span>How Built</div>
+<div class="roadmap-step" onclick="navTo('limitations')"><span class="rs-num">04</span>Limitations</div>
+<div class="roadmap-step" onclick="navTo('agents')"><span class="rs-num">05</span>Agents</div>
+<div class="roadmap-step" onclick="navTo('mcp')"><span class="rs-num">06</span>MCP</div>
+<div class="roadmap-step" onclick="navTo('a2a')"><span class="rs-num">07</span>A2A</div>
+<div class="roadmap-step" onclick="navTo('context-eng')"><span class="rs-num">08</span>Context Eng.</div>
+<div class="roadmap-step" onclick="navTo('coding-agents')"><span class="rs-num">09</span>Coding Agents</div>
+<div class="roadmap-step" onclick="navTo('personal-agents')"><span class="rs-num">10</span>Personal Agents</div>
+<div class="roadmap-step" onclick="navTo('tools')"><span class="rs-num">11</span>Toolkit</div>
+<div class="roadmap-step" onclick="navTo('landscape')"><span class="rs-num">12</span>Landscape</div>
+<div class="roadmap-step" onclick="navTo('learn')"><span class="rs-num">13</span>Learn</div>
+<div class="roadmap-step" onclick="navTo('for-engineers')"><span class="rs-num">14</span>For Engineers</div>
+<div class="roadmap-step" onclick="navTo('future')"><span class="rs-num">15</span>Future</div>
+<div class="roadmap-step" onclick="navTo('flashcards')"><span class="rs-num">16</span>Quiz</div>
+</div>
+</header>
+
+<main class="container">
+
+<!-- ═══ 1: WHAT IS AI ═══ -->
+<section class="section fade-in" id="what-is-ai">
+<div class="section-tag" style="color:var(--accent)">01 — Start here</div>
+<h2>What Is AI, ML, and Generative AI?</h2>
+<p class="lead">Before diving in, here's the hierarchy — each term is a subset of the one above it.</p>
+<div class="diagram-wrap">
+<div class="diagram-title">Hierarchy: broadest → most specific</div>
+<div class="h-flow">
+<div class="node highlight"><div style="font-size:.85rem">Artificial Intelligence</div><div style="font-size:.6rem;color:var(--text2);margin-top:.15rem">Machines with intelligent behavior</div></div>
+<span class="arrow">⊃</span>
+<div class="node blue-hl"><div>Machine Learning</div><div style="font-size:.6rem;color:var(--text2);margin-top:.15rem">Systems that learn from data</div></div>
+<span class="arrow">⊃</span>
+<div class="node cyan-hl"><div>Deep Learning</div><div style="font-size:.6rem;color:var(--text2);margin-top:.15rem">Neural nets with many layers</div></div>
+<span class="arrow">⊃</span>
+<div class="node green-hl"><div>Generative AI</div><div style="font-size:.6rem;color:var(--text2);margin-top:.15rem">Creates new content</div></div>
+</div>
+</div>
+<div class="key-points">
+<div class="kp"><span class="kp-num">01</span><div class="kp-content"><strong>AI</strong> — Any system designed to perform tasks requiring human-like intelligence: understanding language, recognizing patterns, making decisions.</div></div>
+<div class="kp"><span class="kp-num">02</span><div class="kp-content"><strong>Machine Learning</strong> — Systems that learn patterns from data rather than being explicitly programmed. "Show me 10,000 cat photos and I'll learn what a cat looks like."</div></div>
+<div class="kp"><span class="kp-num">03</span><div class="kp-content"><strong>Deep Learning</strong> — Neural networks with many layers. The breakthrough behind modern AI — self-driving cars, voice assistants, image recognition.</div></div>
+<div class="kp"><span class="kp-num">04</span><div class="kp-content"><strong>Generative AI</strong> — Deep learning that <em>creates</em> new content — text, images, music, code. ChatGPT, Claude, Midjourney, and DALL-E are all Generative AI.</div></div>
+</div>
+<div class="callout amber">
+<div class="callout-title">💡 The key insight</div>
+<p>When people say "AI" today, they usually mean <strong>Large Language Models (LLMs)</strong> — a specific type of generative AI trained on text. This guide focuses primarily on LLMs and how they evolve into autonomous agents.</p>
+</div>
+</section>
+
+<!-- ═══ 2: MODEL TYPES ═══ -->
+<section class="section fade-in" id="models">
+<div class="section-tag" style="color:var(--blue)">02 — Types of language models</div>
+<h2>Understanding the Model Zoo</h2>
+<p class="lead">Not all models are built the same. Here's a taxonomy that helps you know what's what.</p>
+<div class="tabs" id="modelTabs">
+<button class="tab-btn active" onclick="showTab('modelTabs','mt-arch')">By Architecture</button>
+<button class="tab-btn" onclick="showTab('modelTabs','mt-train')">By Training</button>
+<button class="tab-btn" onclick="showTab('modelTabs','mt-modal')">By Modality</button>
+</div>
+<div id="mt-arch" class="tab-panel active">
+<div class="card-grid cols-2">
+<div class="card blue"><div class="card-icon">🔤</div><h3>Base / Foundation Models</h3><p>Trained on massive text to predict next words. Broad knowledge but unfocused — "raw intelligence" that needs tuning to be useful.</p><span class="tag">Llama base, GPT base weights</span></div>
+<div class="card amber"><div class="card-icon">💬</div><h3>Instruction-Tuned Models</h3><p>Base models fine-tuned to follow instructions and converse. This is what makes Claude and ChatGPT helpful — they understand <em>what you're asking</em>.</p><span class="tag">Claude, ChatGPT, Gemini</span></div>
+<div class="card cyan"><div class="card-icon">🧠</div><h3>Reasoning Models</h3><p>Trained via reinforcement learning to "think step by step." They spend extra compute on hard problems — math, logic, coding — for higher accuracy.</p><span class="tag">OpenAI o3, DeepSeek-R1</span></div>
+<div class="card green"><div class="card-icon">🧩</div><h3>Mixture-of-Experts (MoE)</h3><p>Many specialized "expert" sub-networks. Only a few activate per input — faster and cheaper while maintaining quality.</p><span class="tag">Llama 4 Scout, Qwen3-235B</span></div>
+</div>
+</div>
+<div id="mt-train" class="tab-panel">
+<div class="card-grid cols-2">
+<div class="card blue"><div class="card-icon">📚</div><h3>Pre-trained Only</h3><p>Learned from raw text. Knows a lot but unpredictable — might complete your sentence or give a random fact. Not optimized for dialogue.</p><span class="tag">Stage: Pre-training only</span></div>
+<div class="card amber"><div class="card-icon">🎯</div><h3>Fine-Tuned / SFT</h3><p>Shown curated Q&A pairs (Supervised Fine-Tuning) after pre-training. Learns <em>how</em> to respond helpfully like an assistant.</p><span class="tag">Pre-train → SFT</span></div>
+<div class="card purple"><div class="card-icon">⚖️</div><h3>RLHF-Aligned</h3><p>Humans rank model outputs. Model learns to prefer higher-rated responses. Makes models safe, honest, and helpful.</p><span class="tag">Pre-train → SFT → RLHF</span></div>
+<div class="card green"><div class="card-icon">✅</div><h3>RLVR (Verifiable Rewards)</h3><p>2025 breakthrough: instead of human ratings, feedback from <em>verifiable</em> answers (math, code tests). Dramatically improves reasoning.</p><span class="tag">Pre-train → SFT → RLVR</span></div>
+</div>
+</div>
+<div id="mt-modal" class="tab-panel">
+<div class="card-grid cols-3">
+<div class="card blue"><div class="card-icon">📝</div><h3>Text-Only LLMs</h3><p>Process and generate text. Most common type.</p><span class="tag">GPT-4, Claude, Llama</span></div>
+<div class="card cyan"><div class="card-icon">👁️</div><h3>Multimodal</h3><p>Handle text + images + audio + video.</p><span class="tag">GPT-4o, Gemini, Claude</span></div>
+<div class="card purple"><div class="card-icon">🎨</div><h3>Image Gen</h3><p>Generate images from text descriptions.</p><span class="tag">DALL-E 3, Midjourney, Flux</span></div>
+<div class="card green"><div class="card-icon">🎵</div><h3>Audio</h3><p>Generate/understand speech and music.</p><span class="tag">Whisper, Suno, ElevenLabs</span></div>
+<div class="card amber"><div class="card-icon">🎬</div><h3>Video</h3><p>Create or edit video from text prompts.</p><span class="tag">Sora, Runway, Veo</span></div>
+<div class="card blue"><div class="card-icon">💻</div><h3>Code</h3><p>Specialized for programming tasks.</p><span class="tag">Codex, Claude Code</span></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 3: HOW BUILT ═══ -->
+<section class="section fade-in" id="how-built">
+<div class="section-tag" style="color:var(--cyan)">03 — How models are built</div>
+<h2>The 3-Stage Pipeline</h2>
+<p class="lead">Building an LLM is like training an expert: broad education → specialization → learning judgment.</p>
+<div class="diagram-wrap">
+<div class="diagram-title">LLM Training Pipeline</div>
+<div class="h-flow">
+<div class="node highlight" style="min-width:140px"><strong>Stage 1</strong><br>Pre-Training<div style="font-size:.58rem;color:var(--text3);margin-top:.2rem">Trillions of tokens · Weeks on 1000s of GPUs · $10M–$100M+</div></div>
+<span class="arrow">→</span>
+<div class="node blue-hl" style="min-width:140px"><strong>Stage 2</strong><br>Fine-Tuning (SFT)<div style="font-size:.58rem;color:var(--text3);margin-top:.2rem">Curated Q&A pairs · Days on fewer GPUs · $10K–$500K</div></div>
+<span class="arrow">→</span>
+<div class="node green-hl" style="min-width:140px"><strong>Stage 3</strong><br>Alignment (RLHF/RLVR)<div style="font-size:.58rem;color:var(--text3);margin-top:.2rem">Human rankings or verifiable rewards · $50K–$1M+</div></div>
+</div>
+</div>
+<div class="key-points">
+<div class="kp"><span class="kp-num">S1</span><div class="kp-content"><strong>Pre-Training</strong> — Reads the entire internet (books, Wikipedia, code). Learns by predicting the next word, billions of times. After: "knows" a lot but can't hold a conversation.<p><em>Analogy: A student who read every book in the library but hasn't learned how to answer exam questions.</em></p></div></div>
+<div class="kp"><span class="kp-num">S2</span><div class="kp-content"><strong>Supervised Fine-Tuning</strong> — Human trainers create ideal conversation examples. Model learns the <em>format</em> of being helpful.<p><em>Analogy: That student takes a course on "how to give good answers in interviews."</em></p></div></div>
+<div class="kp"><span class="kp-num">S3</span><div class="kp-content"><strong>Alignment</strong> — Model generates responses and gets graded by humans (RLHF) or automated checks (RLVR). Learns to be safer, more accurate, more helpful.<p><em>Analogy: A mentor watches their answers and says "this one's better, that one needs work."</em></p></div></div>
+</div>
+<div class="callout blue">
+<div class="callout-title">🏗️ What's a Transformer?</div>
+<p>Almost all modern LLMs use the <strong>Transformer architecture</strong> (2017). Its key innovation is the <strong>attention mechanism</strong> — the model looks at all parts of the input simultaneously to decide which parts are most relevant. This enables understanding context across long passages.</p>
+</div>
+</section>
+
+<!-- ═══ 4: LIMITATIONS ═══ -->
+<section class="section fade-in" id="limitations">
+<div class="section-tag" style="color:var(--pink)">04 — Limitations</div>
+<h2>What Models Can't Do (Yet)</h2>
+<p class="lead">Understanding the boundaries is as important as knowing capabilities. These aren't bugs — they're inherent properties.</p>
+<div class="card-grid cols-2">
+<div class="card" style="border-left:3px solid var(--pink)"><div class="card-icon" style="background:rgba(255,96,144,0.1);color:var(--pink)">🌀</div><h3>Hallucinations</h3><p>Generate plausible but factually wrong text. They predict likely words, not true words. They pattern-match, they don't "know."</p></div>
+<div class="card" style="border-left:3px solid var(--red)"><div class="card-icon" style="background:rgba(255,80,80,0.1);color:var(--red)">🔒</div><h3>Knowledge Cutoff</h3><p>Only know training data up to a specific date. Can't access real-time info unless connected to tools (search, APIs).</p></div>
+<div class="card" style="border-left:3px solid var(--purple)"><div class="card-icon" style="background:var(--glow-p);color:var(--purple)">📏</div><h3>Context Window Limits</h3><p>Can only process a fixed amount of text at once. Even 200K-token windows have practical tracking limits.</p></div>
+<div class="card" style="border-left:3px solid var(--accent)"><div class="card-icon" style="background:var(--glow-a);color:var(--accent)">🎲</div><h3>Non-Deterministic</h3><p>Same question, different answers. LLMs sample from probability distributions. Makes testing harder.</p></div>
+<div class="card" style="border-left:3px solid var(--blue)"><div class="card-icon" style="background:var(--glow-b);color:var(--blue)">🧮</div><h3>Weak at Precise Math</h3><p>Word predictors, not calculators. Struggle with arithmetic and formal logic — though reasoning models are improving this.</p></div>
+<div class="card" style="border-left:3px solid var(--cyan)"><div class="card-icon" style="background:var(--glow-c);color:var(--cyan)">🙈</div><h3>No True Understanding</h3><p>Manipulate statistical patterns, not concepts. Lack common sense, embodied experience, and genuine world knowledge.</p></div>
+</div>
+<div class="callout amber">
+<div class="callout-title">⚡ Why this matters</div>
+<p>These limitations are exactly why we build <strong>agents</strong> — systems wrapping a model with tools, memory, and guardrails. The model is the brain; the agent is the whole body. And the industry keeps solving these limitations — context windows keep growing, reasoning keeps improving, and tool integration keeps deepening.</p>
+</div>
+</section>
+
+<!-- ═══ 5: AGENTS ═══ -->
+<section class="section fade-in" id="agents">
+<div class="section-tag" style="color:var(--green)">05 — AI Agents</div>
+<h2>How Agents Are Built</h2>
+<p class="lead">An agent wraps a model in a loop with memory, tools, and the ability to act — turning a chatbot into an autonomous worker.</p>
+<div class="callout green">
+<div class="callout-title">🎯 The simplest definition</div>
+<p><strong>Agent = Model + Loop + Memory + Tools.</strong> The loop gives the model multiple chances to think, act, observe results, and adjust. This is what gives AI systems <em>agency</em>.</p>
+</div>
+<div class="diagram-wrap">
+<div class="diagram-title">The Agent Loop (ReAct Pattern)</div>
+<div class="agent-loop">
+<div class="al-row"><div class="al-box" style="border-color:var(--accent);background:var(--glow-a)">📥 <strong>Input</strong><small>User request or trigger</small></div></div>
+<div class="al-arrow">↓</div>
+<div class="al-row"><div class="al-box" style="border-color:var(--blue);background:var(--glow-b)">🧠 <strong>Reason</strong><small>LLM decides what to do</small></div><div class="al-feedback">← Memory & Context fed in</div></div>
+<div class="al-arrow">↓</div>
+<div class="al-row"><div class="al-box" style="border-color:var(--purple);background:var(--glow-p)">🛠️ <strong>Act</strong><small>Call a tool / take action</small></div><div class="al-feedback">← Tools: search, API, DB, code</div></div>
+<div class="al-arrow">↓</div>
+<div class="al-row"><div class="al-box" style="border-color:var(--cyan);background:var(--glow-c)">👁️ <strong>Observe</strong><small>Read the tool's output</small></div></div>
+<div class="al-arrow">↓</div>
+<div class="al-row"><div class="al-box" style="border-color:var(--green);background:var(--glow-g)">🔄 <strong>Loop or Finish</strong><small>"Do I need more steps?"</small></div></div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);margin-top:.4rem;text-align:center">↻ Repeats until task is complete or max steps reached</div>
+</div>
+</div>
+
+<h3 class="sub">The 4 Core Components</h3>
+<div class="card-grid cols-2">
+<div class="card amber"><div class="card-icon">🧠</div><h3>1. The Model (Brain)</h3><p>The LLM doing the reasoning. Interprets requests, selects tools, generates responses. The reasoning engine at center.</p><span class="tag">Claude, GPT-4, Gemini, Llama</span></div>
+<div class="card green"><div class="card-icon">💾</div><h3>2. Memory (State)</h3><p><strong>Short-term:</strong> Current conversation context window.<br><strong>Long-term:</strong> Persisted facts, preferences, learned info stored externally and retrieved when needed.</p><span class="tag">Session context, vector DBs, memory stores</span></div>
+<div class="card blue"><div class="card-icon">🔧</div><h3>3. Tools (Hands)</h3><p>External capabilities: web search, DB queries, code execution, APIs. Tools give the model <strong>data</strong> (what it can see) and <strong>actions</strong> (what it can do).</p><span class="tag">Search, APIs, code runners, MCP servers</span></div>
+<div class="card purple"><div class="card-icon">🔄</div><h3>4. The Loop / Orchestrator</h3><p>The workflow driving Reason → Act → Observe. Manages step count, stopping conditions, error handling. Turns a single model call into <em>autonomous workflow</em>.</p><span class="tag">LangGraph, CrewAI, custom code</span></div>
+</div>
+
+<h3 class="sub">Agent Composition Patterns</h3>
+<div class="card-grid cols-3">
+<div class="card cyan"><h3>Single Agent</h3><p>One model in a loop with tools. Good for focused tasks: Q&A, coding, analysis.</p><span class="tag">Simplest</span></div>
+<div class="card amber"><h3>Multi-Agent</h3><p>Specialized agents collaborate: one researches, one writes, one reviews. They pass messages.</p><span class="tag">CrewAI, AutoGen</span></div>
+<div class="card purple"><h3>Orchestrator + Workers</h3><p>A "boss" breaks tasks into subtasks and delegates. Workers execute; orchestrator synthesizes.</p><span class="tag">Most scalable</span></div>
+</div>
+</section>
+
+<!-- ═══ 6: MCP ═══ -->
+<section class="section fade-in" id="mcp">
+<div class="section-tag" style="color:var(--cyan)">06 — Model Context Protocol (MCP) <span class="evolving">Evolving</span></div>
+<h2><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(120,180,255,0.3)">MCP</a>: USB-C for AI</h2>
+<p class="lead">MCP is an open standard (by Anthropic, Nov 2024) that standardizes how AI models connect to external tools and data. Adopted by OpenAI, Google, and all major platforms by mid-2025. Full spec and SDKs at <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">modelcontextprotocol.io</a>.</p>
+
+<div class="diagram-wrap">
+<div class="diagram-title">MCP Architecture: Host → Client → Server → Data</div>
+<div class="mcp-arch">
+<div class="mcp-col">
+<div class="mcp-box" style="border-color:var(--accent);background:var(--glow-a)"><strong>🏠 Host</strong><small>The AI app (Claude Desktop, Cursor, your app). Creates clients, manages permissions.</small></div>
+</div>
+<div class="mcp-connector">→</div>
+<div class="mcp-col">
+<div class="mcp-box" style="border-color:var(--blue);background:var(--glow-b)"><strong>📡 Client</strong><small>Runs inside the host. Discovers servers, routes requests, manages connections.</small></div>
+</div>
+<div class="mcp-connector">→</div>
+<div class="mcp-col">
+<div class="mcp-box" style="border-color:var(--purple);background:var(--glow-p)"><strong>⚙️ Server</strong><small>Exposes capabilities via a standard interface. One server per integration.</small></div>
+</div>
+<div class="mcp-connector">→</div>
+<div class="mcp-col">
+<div class="mcp-box" style="border-color:var(--green);background:var(--glow-g)"><strong>💿 Data Sources</strong><small>Files, databases, APIs, SaaS services, anything.</small></div>
+</div>
+</div>
+</div>
+
+<h3 class="sub">The 3 Server Capabilities</h3>
+<p style="color:var(--text2);font-size:.85rem;margin-bottom:.8rem">Every MCP server exposes exactly three categories. Think of them as: <strong>nouns, verbs, and templates</strong>.</p>
+
+<div class="card-grid cols-3">
+<div class="card cyan"><div class="card-icon">📄</div>
+<h3>Resources (Nouns)</h3>
+<p><strong>Read-only data</strong> the model can access. Files, database rows, API responses. Each resource has a URI, name, and MIME type. The model reads them for context.</p>
+<span class="tag">Data the model can SEE</span>
+</div>
+<div class="card purple"><div class="card-icon">🔧</div>
+<h3>Tools (Verbs)</h3>
+<p><strong>Actions the model can invoke.</strong> Each tool has a name, description, and JSON input schema. The model decides when to call them. Examples: run SQL query, send email, create file.</p>
+<span class="tag">Actions the model can DO</span>
+</div>
+<div class="card amber"><div class="card-icon">📋</div>
+<h3>Prompts (Templates)</h3>
+<p><strong>Reusable prompt templates</strong> the host can render. Pre-built workflows like "analyze these logs" or "summarize this doc." Users or agents select the right prompt for the task.</p>
+<span class="tag">Workflows the model can FOLLOW</span>
+</div>
+</div>
+
+<h3 class="sub">Transport Layer</h3>
+<p style="color:var(--text2);font-size:.85rem;margin-bottom:.8rem">MCP servers communicate via standard transports — no proprietary protocols needed:</p>
+<div class="key-points">
+<div class="kp"><span class="kp-num" style="color:var(--cyan)">⬡</span><div class="kp-content"><strong>stdio</strong> — For local servers running on your machine. The host spawns the server as a subprocess. Simplest setup.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--blue)">⬡</span><div class="kp-content"><strong>HTTP + SSE</strong> — For remote servers. Uses Server-Sent Events for streaming. The standard for cloud-hosted MCP servers.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--purple)">⬡</span><div class="kp-content"><strong>WebSocket</strong> — Coming in the 2026 roadmap. For persistent, bidirectional connections needed by long-running agent workflows.</div></div>
+</div>
+
+<div class="callout cyan">
+<div class="callout-title">🌍 Why MCP matters</div>
+<p>Before MCP, every AI app needed custom integrations for every tool — an M×N problem. MCP reduces this to M+N: build one server for your tool, and <em>every</em> AI app that speaks MCP can use it. GitHub, Google Drive, Slack, Postgres — all accessible through a single standard. The MCP ecosystem now has thousands of community servers.</p>
+</div>
+</section>
+
+<!-- ═══ 7: A2A ═══ -->
+<section class="section fade-in" id="a2a">
+<div class="section-tag" style="color:var(--purple)">07 — Agent-to-Agent Protocol (A2A) <span class="evolving">Evolving</span></div>
+<h2><a href="https://a2a-protocol.org" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(120,180,255,0.3)">A2A</a>: Agents Talking to Agents</h2>
+<p class="lead">If MCP connects agents to <em>tools</em>, A2A connects agents to <em>each other</em>. Launched by Google in April 2025, now governed by the Linux Foundation with 150+ partner organizations. Spec at <a href="https://a2a-protocol.org" target="_blank" rel="noopener">a2a-protocol.org</a>.</p>
+
+<div class="callout purple">
+<div class="callout-title">🔗 MCP vs A2A — Complementary, Not Competing</div>
+<p><strong>MCP</strong> = Agent ↔ Tool communication (how an agent uses a database, API, or file system).<br>
+<strong>A2A</strong> = Agent ↔ Agent communication (how a research agent delegates to a data analysis agent from a different vendor).<br>
+Together, they form the "nervous system" of multi-agent enterprise systems.</p>
+</div>
+
+<h3 class="sub">A2A Core Components</h3>
+<div class="card-grid cols-2">
+<div class="card purple"><div class="card-icon">🪪</div>
+<h3>Agent Card</h3>
+<p>A JSON file at <code>/.well-known/agent.json</code> that describes an agent's name, capabilities, skills, supported modalities, auth requirements, and endpoint URL. Think of it as a resume that lets other agents discover what you can do.</p>
+<span class="tag">Discovery mechanism</span>
+</div>
+<div class="card blue"><div class="card-icon">📋</div>
+<h3>Tasks</h3>
+<p>The unit of work. A client agent sends a task; the remote agent processes it. Tasks have lifecycle states: submitted → working → completed/failed. Supports long-running async work.</p>
+<span class="tag">Work management</span>
+</div>
+<div class="card amber"><div class="card-icon">💬</div>
+<h3>Messages & Parts</h3>
+<p>Agents communicate via messages containing "parts" — text, files, structured data, or forms. Supports multi-modal exchange. Agents negotiate which content types they understand.</p>
+<span class="tag">Communication</span>
+</div>
+<div class="card green"><div class="card-icon">📦</div>
+<h3>Artifacts</h3>
+<p>The output of a completed task. Could be generated text, files, data, or any deliverable. Artifacts are returned to the client agent for use in its own workflow.</p>
+<span class="tag">Deliverables</span>
+</div>
+</div>
+
+<div class="diagram-wrap">
+<div class="diagram-title">A2A Flow: Client Agent → Remote Agent</div>
+<div class="h-flow">
+<div class="node highlight">Client Agent<div style="font-size:.58rem;color:var(--text2)">has a goal</div></div>
+<span class="arrow">→</span>
+<div class="node purple-hl">Discover<div style="font-size:.58rem;color:var(--text2)">fetch Agent Cards</div></div>
+<span class="arrow">→</span>
+<div class="node blue-hl">Send Task<div style="font-size:.58rem;color:var(--text2)">JSON-RPC request</div></div>
+<span class="arrow">→</span>
+<div class="node cyan-hl">Remote Agent<div style="font-size:.58rem;color:var(--text2)">processes work</div></div>
+<span class="arrow">→</span>
+<div class="node green-hl">Return Artifact<div style="font-size:.58rem;color:var(--text2)">results + status</div></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 8: CONTEXT ENGINEERING ═══ -->
+<section class="section fade-in" id="context-eng">
+<div class="section-tag" style="color:var(--accent)">08 — Context Engineering</div>
+<h2>The Art of Feeding the Right Info</h2>
+<p class="lead">If the LLM is a CPU and its context window is RAM, <strong>context engineering</strong> is the art of loading exactly the right data into memory — coined by Andrej Karpathy & Tobi Lütke (Shopify CEO) in mid-2025.</p>
+
+<div class="diagram-wrap">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;max-width:550px;margin:0 auto">
+<div style="padding:.7rem;border-radius:7px;background:var(--surface);border:1px solid rgba(240,160,64,0.2);text-align:center">
+<div style="font-size:.6rem;color:var(--accent);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.2rem">Old World</div>
+<div style="font-size:.85rem;font-weight:600">Prompt Engineering</div>
+<div style="font-size:.7rem;color:var(--text3);margin-top:.2rem">"What you say" — crafting the question</div>
+</div>
+<div style="padding:.7rem;border-radius:7px;background:var(--surface);border:1px solid rgba(80,216,128,0.25);text-align:center">
+<div style="font-size:.6rem;color:var(--green);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.2rem">New World</div>
+<div style="font-size:.85rem;font-weight:600">Context Engineering</div>
+<div style="font-size:.7rem;color:var(--text3);margin-top:.2rem">"Everything the model sees" — system prompt, examples, docs, tools, memory, state</div>
+</div>
+</div>
+</div>
+
+<h3 class="sub">Building Blocks of Context</h3>
+<div class="key-points">
+<div class="kp"><span class="kp-num" style="color:var(--blue)">📋</span><div class="kp-content"><strong>System Prompt / Instructions</strong> — Foundational instructions defining the model's behavior, persona, and rules. Like a job description.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--cyan)">📂</span><div class="kp-content"><strong>Retrieved Documents (RAG)</strong> — Relevant docs pulled from vector DBs or search and inserted into context. How models answer about <em>your</em> data.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--green)">💬</span><div class="kp-content"><strong>Conversation History</strong> — Prior messages for continuity. Longer conversations need compacting (summarization) to stay within limits.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--purple)">🧰</span><div class="kp-content"><strong>Tool Definitions & Results</strong> — Available tools (name, inputs, description) and results of past calls. Via MCP or function calling APIs.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--accent)">💾</span><div class="kp-content"><strong>Memory & User Profile</strong> — Persisted facts from past sessions: preferences, decisions, project context. Gives cross-session continuity.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--pink)">📎</span><div class="kp-content"><strong>Few-Shot Examples</strong> — Concrete input/output pairs showing the model what you want. Often the single most effective technique.</div></div>
+</div>
+
+<h3 class="sub">RAG — Retrieval-Augmented Generation</h3>
+<p style="color:var(--text2);font-size:.85rem;margin-bottom:.8rem">The most common context engineering technique. Two phases, both <strong>continuous</strong> — Phase 1 runs whenever new data arrives, not just once.</p>
+
+<div class="diagram-wrap">
+<div style="margin-bottom:1rem">
+<div style="font-size:.65rem;color:var(--blue);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;margin-bottom:.4rem">PHASE 1 — INDEXING (runs continuously as new data arrives)</div>
+<div class="h-flow">
+<div class="node blue-hl">📄 New/Updated<br>Documents</div>
+<span class="arrow">→</span>
+<div class="node blue-hl">✂️ Chunking<div style="font-size:.55rem;color:var(--text3)">Split into passages<br>(fixed-size, semantic, or recursive)</div></div>
+<span class="arrow">→</span>
+<div class="node highlight">🔢 Embedding<br>Model<div style="font-size:.55rem;color:var(--text3)">text-embedding-3<br>BGE, Cohere Embed</div></div>
+<span class="arrow">→</span>
+<div class="node blue-hl">🗄️ Vector<br>Store<div style="font-size:.55rem;color:var(--text3)">Pinecone, pgvector<br>Weaviate, Chroma</div></div>
+</div>
+<div style="font-size:.6rem;color:var(--text3);text-align:center;margin-top:.4rem">🔄 Re-indexing triggered by data changes, schedules, or webhooks — not a one-time operation</div>
+</div>
+<div>
+<div style="font-size:.65rem;color:var(--green);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;margin-bottom:.4rem">PHASE 2 — QUERYING (at runtime, per user question)</div>
+<div class="h-flow">
+<div class="node green-hl">❓ User<br>Query</div>
+<span class="arrow">→</span>
+<div class="node highlight">🔢 Embed Query<div style="font-size:.55rem;color:var(--text3)">MUST use same<br>embedding model</div></div>
+<span class="arrow">→</span>
+<div class="node green-hl">🔍 Search<div style="font-size:.55rem;color:var(--text3)">Vector similarity<br>+ keyword hybrid<br>+ reranking</div></div>
+<span class="arrow">→</span>
+<div class="node green-hl">📋 Context<br>Assembly<div style="font-size:.55rem;color:var(--text3)">Rank, dedupe, trim<br>to fit window</div></div>
+<span class="arrow">→</span>
+<div class="node green-hl">🧠 LLM<br>Answer<div style="font-size:.55rem;color:var(--text3)">Generate with<br>retrieved context</div></div>
+</div>
+<div style="font-size:.6rem;color:var(--text3);text-align:center;margin-top:.4rem">↩ Answer returned to user · Feedback can improve future retrieval</div>
+</div>
+</div>
+
+<h3 class="sub">Search Types Within (and Beyond) RAG</h3>
+<p style="color:var(--text2);font-size:.85rem;margin-bottom:.8rem">Retrieval has evolved dramatically. Here are the 5 approaches you'll encounter — from simplest to most sophisticated:</p>
+<div class="card-grid cols-2" style="margin-bottom:1rem">
+<div class="card cyan"><h3>1. Vector Search</h3><p>Compare embedding similarity. Finds semantically related content even without exact keyword matches. Good for natural-language queries over document corpora.</p><span class="tag">Dense retrieval</span></div>
+<div class="card amber"><h3>2. Keyword / BM25</h3><p>Traditional text matching. Excellent for exact terms, names, code identifiers, error messages. Fast, explainable, cheap.</p><span class="tag">Sparse retrieval</span></div>
+<div class="card green"><h3>3. Hybrid + Rerank</h3><p>Combine vector + keyword results, then use a reranker model to sort by true relevance. The production-standard RAG setup for most knowledge bases.</p><span class="tag">Best of both worlds</span></div>
+<div class="card purple"><h3>4. <a href="https://microsoft.github.io/graphrag/" target="_blank" rel="noopener">GraphRAG</a> <span class="evolving" style="font-size:.55rem">Evolving</span></h3><p>Microsoft's approach: the LLM extracts a <strong>knowledge graph</strong> from documents (entities + relationships), builds community hierarchies, and queries across the graph. Handles <em>multi-hop questions</em> vector search can't — like "what are our termination rights if the supplier fails quality standards for 3 quarters?" The March 2026 release (<a href="https://www.microsoft.com/en-us/research/blog/lazygraphrag-setting-a-new-standard-for-quality-and-cost/" target="_blank" rel="noopener">LazyGraphRAG</a>) dramatically reduced indexing costs. Strong for legal, medical, and enterprise knowledge work.</p><span class="tag">Knowledge graphs · Multi-hop reasoning</span></div>
+</div>
+
+<div class="card blue" style="border-left:3px solid var(--blue)"><div class="card-icon" style="background:var(--glow-b);color:var(--blue)">🔍</div>
+<h3>5. Agentic Search <span class="evolving" style="font-size:.55rem">New paradigm</span></h3>
+<p>Instead of pre-indexing everything into a vector store, the agent <strong>explores at runtime</strong> using tools like <code>grep</code>, <code>glob</code>, and <code>read</code>. It's <em>iterative</em>: query → result → "not quite" → refined query → better result → synthesize. Made famous by Claude Code — Boris Cherny (creator) publicly explained why Anthropic dropped RAG + vector DB in favor of agentic search: <em>simpler, no staleness, no privacy issues, and "outperformed everything else by a lot."</em></p>
+<p style="margin-top:.6rem"><strong>How Claude Code uses it:</strong> When asked to understand a codebase, Claude Code doesn't run embedding search. It <em>explores</em> — lists directories, greps for patterns, reads key files, follows imports, checks tests and docs, builds understanding iteratively. No pre-indexing required. The model's reasoning drives the search strategy.</p>
+<p style="margin-top:.6rem"><strong>When to use what:</strong> Agentic search wins for <em>code exploration, fresh data, security-sensitive contexts</em>. Vector RAG/GraphRAG still wins for <em>large static corpora, concept search, multi-hop reasoning</em>. Most production systems now use hybrid approaches — agentic as the backbone, with semantic index only where needed.</p>
+<span class="tag">Runtime exploration · No indexing · Iterative</span>
+</div>
+</section>
+
+<!-- ═══ 9: CODING AGENTS ═══ -->
+<section class="section fade-in" id="coding-agents">
+<div class="section-tag" style="color:var(--blue)">09 — Coding Agents</div>
+<h2>AI That Writes Code</h2>
+<p class="lead">Coding agents go beyond autocomplete — they read your entire codebase, make multi-file changes, run tests, and iterate. The hottest category in AI tooling right now.</p>
+
+<div class="card-grid cols-2">
+<div class="card amber"><div class="card-icon">⚡</div>
+<h3><a href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener">Claude Code</a> (Anthropic)</h3>
+<p>Terminal-based agent powered by Claude Opus/Sonnet. Runs locally — reads your filesystem, executes in your terminal, uses your git. Deep codebase awareness. Highest SWE-bench score (80.9%). Supports Agent Teams for multi-agent workflows.</p>
+<span class="tag">Local · Terminal · 4% of all GitHub commits</span>
+</div>
+<div class="card blue"><div class="card-icon">🤖</div>
+<h3><a href="https://openai.com/codex" target="_blank" rel="noopener">Codex</a> (OpenAI)</h3>
+<p>Dual-mode: cloud agent (async tasks in sandboxed containers via ChatGPT) + Codex CLI (local terminal). Powered by GPT-5.3-Codex. Leads Terminal-Bench 2.0 at 77.3%. Very token-efficient — 4x fewer tokens than Claude Code.</p>
+<span class="tag">Cloud + Local · Async tasks</span>
+</div>
+<div class="card green"><div class="card-icon">🌐</div>
+<h3><a href="https://opencode.ai" target="_blank" rel="noopener">OpenCode</a></h3>
+<p>Open-source, provider-agnostic CLI. Supports 75+ LLM providers (Anthropic, OpenAI, Google, DeepSeek, <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a>). 112K GitHub stars. Full MCP server support. Trade-off: less polished than Claude Code but maximum flexibility.</p>
+<span class="tag">Open source · Any model · 75+ providers</span>
+</div>
+<div class="card purple"><div class="card-icon">💎</div>
+<h3><a href="https://cursor.com" target="_blank" rel="noopener">Cursor</a> / <a href="https://windsurf.com" target="_blank" rel="noopener">Windsurf</a></h3>
+<p>IDE-integrated agents (VS Code forks). Cursor pioneered the "Cursor for X" pattern — domain-specific AI apps layering context engineering on top of models. Natural for developers who prefer GUI over terminal.</p>
+<span class="tag">IDE-based · GUI · Context-aware</span>
+</div>
+</div>
+
+<div class="callout blue">
+<div class="callout-title">🎯 Choosing between them</div>
+<p>Use <strong>Claude Code</strong> for architecture and complex features (higher quality). Use <strong>Codex</strong> for autonomous/async tasks and cost-sensitive workloads (more efficient). Use <strong>OpenCode</strong> if you want open-source freedom and multi-provider flexibility. Use <strong>Cursor</strong> if you prefer IDE-based workflow. Many developers use multiple tools.</p>
+</div>
+</section>
+
+<!-- ═══ 10: PERSONAL AGENTS ═══ -->
+<section class="section fade-in" id="personal-agents">
+<div class="section-tag" style="color:var(--green)">10 — Personalized Agents <span class="evolving">Evolving</span></div>
+<h2>AI That Lives in Your Daily Tools</h2>
+<p class="lead">The next frontier: agents that integrate with your messaging apps (Telegram, WhatsApp, Slack), manage your calendar, email, and tasks — proactively, not just when you ask.</p>
+
+<div class="card-grid cols-2">
+<div class="card green"><div class="card-icon">🐾</div>
+<h3><a href="https://github.com/steipete/claude-code-is-programmable" target="_blank" rel="noopener">OpenClaw</a> <span style="font-size:.6rem;color:var(--text3);font-weight:400">(née Clawdbot)</span></h3>
+<p>Started as <strong>Clawdbot</strong> — a weekend WhatsApp relay by Peter Steinberger (PSPDFKit founder) in late 2025. Renamed to Moltbot after a trademark complaint, settled on OpenClaw in Jan 2026. Hit 145K+ GitHub stars and kicked off the entire personal-agent movement. Self-hosted, connects to 23+ messaging platforms, supports MCP natively, 700+ community-contributed skills on ClawHub, three-tier memory. Creator joined OpenAI in Feb 2026; project moved to a non-profit foundation.</p>
+<span class="tag">MIT · 145K+ stars · BYOK</span>
+</div>
+<div class="card blue"><div class="card-icon">🤖</div>
+<h3><a href="https://github.com/HKUDS/nanobot" target="_blank" rel="noopener">Nanobot</a></h3>
+<p>Ultra-lightweight Clawdbot-style agent from the <a href="https://sites.google.com/view/chaoh" target="_blank" rel="noopener">HKUDS lab</a> — only ~4,000 lines of Python (vs OpenClaw's 430K+). Designed for full auditability: you can read the entire codebase in an afternoon. Runs on hardware as small as a Raspberry Pi (191MB RAM). Supports Claude, GPT, DeepSeek, and local models via <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a>/<a href="https://github.com/vllm-project/vllm" target="_blank" rel="noopener">vLLM</a>. Persistent memory with knowledge graph, web search, sub-agents, Telegram + WhatsApp.</p>
+<span class="tag">Open source · Auditable · Edge-ready</span>
+</div>
+<div class="card amber" style="grid-column:1/-1"><div class="card-icon">⚙️</div>
+<h3>The Broader Ecosystem</h3>
+<p>Zeroclaw (minimal Rust-based infrastructure), <a href="https://www.oneclaw.net" target="_blank" rel="noopener">OneClaw</a> / OpenClaw Launch / MyClaw (managed hosting for OpenClaw), <a href="https://www.openinterpreter.com" target="_blank" rel="noopener">Open Interpreter</a> (local code execution agent), and <a href="https://github.com/Significant-Gravitas/AutoGPT" target="_blank" rel="noopener">AutoGPT</a> (the original autonomous agent, April 2023). The space is evolving fast — new projects appear weekly, many forking or riffing on OpenClaw's design.</p>
+<span class="tag">Evolving space</span>
+</div>
+</div>
+
+<h3 class="sub">What Makes Personal Agents Different</h3>
+<div class="key-points">
+<div class="kp"><span class="kp-num" style="color:var(--green)">📱</span><div class="kp-content"><strong>Chat-native interface</strong> — Lives where you already communicate (WhatsApp, Telegram) instead of requiring a separate app or browser tab.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--accent)">🔄</span><div class="kp-content"><strong>Proactive, not just reactive</strong> — Can schedule morning briefings, monitor for events, run recurring tasks via cron jobs and webhooks. Not just "you ask, it answers."</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--blue)">💾</span><div class="kp-content"><strong>Persistent memory</strong> — Remembers context across conversations. Knows your preferences, projects, and history without re-explaining each time.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--purple)">🔗</span><div class="kp-content"><strong>MCP-powered tool access</strong> — Connects to GitHub, Notion, calendars, smart home devices, health trackers — all through MCP servers and native integrations.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--pink)">⚠️</span><div class="kp-content"><strong>Caution required</strong> — Granting system access to agents carries real risks: security vulnerabilities, malicious extensions, and unintended actions. Always use sandboxing and human-in-the-loop for consequential decisions.</div></div>
+</div>
+</section>
+
+<!-- ═══ 11: TOOLKIT ═══ -->
+<section class="section fade-in" id="tools">
+<div class="section-tag" style="color:var(--accent)">11 — The Builder's Toolkit</div>
+<h2>Frameworks & Tools for Building AI</h2>
+<p class="lead">The frameworks and infrastructure you'll encounter when building AI applications.</p>
+
+<div class="tabs" id="toolTabs">
+<button class="tab-btn active" onclick="showTab('toolTabs','tt-frame')">Agent Frameworks</button>
+<button class="tab-btn" onclick="showTab('toolTabs','tt-data')">Data & Retrieval</button>
+<button class="tab-btn" onclick="showTab('toolTabs','tt-infra')">Infrastructure</button>
+</div>
+
+<div id="tt-frame" class="tab-panel active">
+<div class="card-grid cols-2">
+<div class="card amber"><h3><a href="https://www.langchain.com" target="_blank" rel="noopener">LangChain</a> / <a href="https://www.langchain.com/langgraph" target="_blank" rel="noopener">LangGraph</a></h3><p>Most popular LLM framework. LangChain for chains of model calls; LangGraph adds stateful graph-based agent workflows with branching and error recovery.</p><span class="tag">Python & TypeScript</span></div>
+<div class="card blue"><h3><a href="https://www.crewai.com" target="_blank" rel="noopener">CrewAI</a></h3><p>Multi-agent framework with role-based agents (researcher, writer, reviewer) that collaborate on tasks. Great for complex workflows.</p><span class="tag">Python · Role-based agents</span></div>
+<div class="card green"><h3><a href="https://microsoft.github.io/autogen/" target="_blank" rel="noopener">AutoGen</a> (Microsoft)</h3><p>Multi-agent conversations framework. Agents code, debug, and discuss with each other. Strong at collaborative problem-solving.</p><span class="tag">Python · Multi-agent chat</span></div>
+<div class="card purple"><div class="card-icon">🎯</div><h3><a href="https://boundaryml.com" target="_blank" rel="noopener">BAML</a> (<a href="https://github.com/BoundaryML/baml" target="_blank" rel="noopener">BoundaryML</a>)</h3>
+<p>A domain-specific language for getting <strong>structured outputs</strong> from LLMs reliably. Write typed function contracts in <code>.baml</code> files; BAML generates type-safe clients for Python, TypeScript, Ruby, Go, and more. Uses Schema-Aligned Parsing (SAP) to handle messy LLM output — works even with models that don't support native tool-calling. Built-in VS Code playground for live prompt testing.</p>
+<span class="tag">Structured output · Multi-language · Open source</span>
+</div>
+</div>
+</div>
+
+<div id="tt-data" class="tab-panel">
+<div class="card-grid cols-2">
+<div class="card cyan"><h3>Vector Databases</h3><p>Store and search embeddings for RAG. Find "similar" documents by meaning, not keywords. Core infrastructure for retrieval.</p><span class="tag"><a href="https://www.pinecone.io" target="_blank" rel="noopener">Pinecone</a>, <a href="https://weaviate.io" target="_blank" rel="noopener">Weaviate</a>, <a href="https://www.trychroma.com" target="_blank" rel="noopener">ChromaDB</a>, <a href="https://github.com/pgvector/pgvector" target="_blank" rel="noopener">pgvector</a></span></div>
+<div class="card amber"><h3><a href="https://www.llamaindex.ai" target="_blank" rel="noopener">LlamaIndex</a></h3><p>Framework connecting LLMs to your data. Handles parsing, chunking, indexing, retrieval. The "data plumbing" for AI apps.</p><span class="tag">RAG pipelines · Data connectors</span></div>
+<div class="card blue"><h3>Embedding Models</h3><p>Convert text to numerical vectors capturing meaning. Essential for RAG — query embedded and compared to document embeddings.</p><span class="tag"><a href="https://platform.openai.com/docs/guides/embeddings" target="_blank" rel="noopener">text-embedding-3</a>, <a href="https://huggingface.co/BAAI/bge-large-en-v1.5" target="_blank" rel="noopener">BGE</a>, <a href="https://cohere.com/embed" target="_blank" rel="noopener">Cohere Embed</a></span></div>
+<div class="card green"><h3><a href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">MCP Servers (Ecosystem)</a></h3><p>Thousands of community-built servers exposing tools via the MCP standard. Google, Slack, GitHub, Postgres — a growing ecosystem.</p><span class="tag">Open standard · Universal</span></div>
+</div>
+</div>
+
+<div id="tt-infra" class="tab-panel">
+<div class="card-grid cols-2">
+<div class="card purple"><h3>Cloud AI Platforms</h3><p>Managed services for running models. GPUs, APIs, hosting, scaling without managing infrastructure.</p><span class="tag"><a href="https://aws.amazon.com/bedrock/" target="_blank" rel="noopener">AWS Bedrock</a>, <a href="https://azure.microsoft.com/products/ai-services/openai-service" target="_blank" rel="noopener">Azure AI</a>, <a href="https://cloud.google.com/vertex-ai" target="_blank" rel="noopener">Google Vertex AI</a></span></div>
+<div class="card amber"><h3>Model APIs</h3><p>Simplest way to use AI: HTTP call, text in, response back. No GPU needed — pay per token.</p><span class="tag"><a href="https://docs.anthropic.com/en/api" target="_blank" rel="noopener">Anthropic</a>, <a href="https://platform.openai.com/docs" target="_blank" rel="noopener">OpenAI</a>, <a href="https://ai.google.dev" target="_blank" rel="noopener">Google</a> APIs</span></div>
+<div class="card green"><h3>Open Source & Self-Hosting</h3><p>Run models locally or on your servers. Full control & privacy, but requires GPUs and ops expertise.</p><span class="tag"><a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a>, <a href="https://github.com/vllm-project/vllm" target="_blank" rel="noopener">vLLM</a>, <a href="https://huggingface.co" target="_blank" rel="noopener">Hugging Face</a>, <a href="https://github.com/ggerganov/llama.cpp" target="_blank" rel="noopener">llama.cpp</a></span></div>
+<div class="card blue"><h3>Observability & Eval</h3><p>Monitor agent behavior, trace tool calls, evaluate quality. Essential for debugging production agents.</p><span class="tag"><a href="https://www.langchain.com/langsmith" target="_blank" rel="noopener">LangSmith</a>, <a href="https://arize.com" target="_blank" rel="noopener">Arize</a>, <a href="https://braintrust.dev" target="_blank" rel="noopener">Braintrust</a></span></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 12: LANDSCAPE ═══ -->
+<section class="section fade-in" id="landscape">
+<div class="section-tag" style="color:var(--cyan)">12 — The AI Landscape</div>
+<h2>Who's Who: Labs & Platforms</h2>
+<p style="color:var(--text3);font-size:.72rem;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;margin-bottom:.6rem">Current as of April 2026 — this space moves weekly</p>
+<table class="comp-table">
+<thead><tr><th>Organization</th><th>Latest Flagship Models</th><th>Known For</th></tr></thead>
+<tbody>
+<tr><td class="label"><a href="https://www.anthropic.com" target="_blank" rel="noopener">Anthropic</a></td><td>Claude Opus 4.6, Sonnet 4.6, Haiku 4.5</td><td>Safety-first, 1M context (beta), adaptive thinking, top coding (SWE-bench), MCP protocol, Claude Code</td></tr>
+<tr><td class="label"><a href="https://openai.com" target="_blank" rel="noopener">OpenAI</a></td><td>GPT-5.4, o3, GPT-5.3-Codex</td><td>Consumer AI leader, reasoning models, broadest ecosystem, Codex coding agent</td></tr>
+<tr><td class="label"><a href="https://deepmind.google" target="_blank" rel="noopener">Google DeepMind</a></td><td>Gemini 3.1 Ultra / Pro / Flash-Lite</td><td>Top reasoning scores (GPQA, ARC-AGI), cheapest output pricing, A2A protocol, 1M context</td></tr>
+<tr><td class="label"><a href="https://www.llama.com" target="_blank" rel="noopener">Meta</a></td><td>Llama 4 Scout / Maverick</td><td>Open-source leader, 10M context window (largest open-weight), MoE architecture</td></tr>
+<tr><td class="label"><a href="https://x.ai" target="_blank" rel="noopener">xAI</a></td><td>Grok 4.20</td><td>Real-time X/Twitter data, multi-agent workflows, 1M context</td></tr>
+<tr><td class="label"><a href="https://www.deepseek.com" target="_blank" rel="noopener">DeepSeek</a></td><td>DeepSeek-R1, V3, V4</td><td>Pioneered RLVR, open weights reasoning, exceptional cost efficiency</td></tr>
+<tr><td class="label"><a href="https://qwen.ai" target="_blank" rel="noopener">Alibaba / Qwen</a></td><td>Qwen 3.5 (0.8B–235B)</td><td>Strongest open multilingual, native multimodal, Apache 2.0</td></tr>
+<tr><td class="label"><a href="https://www.zhipuai.cn/en" target="_blank" rel="noopener">Zhipu AI</a></td><td>GLM-5 / GLM-5.1</td><td>Top open-weight coding (94.6% of Opus 4.6 perf), MIT license</td></tr>
+<tr><td class="label"><a href="https://mistral.ai" target="_blank" rel="noopener">Mistral</a></td><td>Mistral Large, Mixtral</td><td>European lab, efficient open models, MoE pioneer</td></tr>
+</tbody>
+</table>
+<table class="comp-table" style="margin-top:1rem">
+<thead><tr><th>Cloud</th><th>AI Service</th><th>Offers</th></tr></thead>
+<tbody>
+<tr><td class="label">AWS</td><td><a href="https://aws.amazon.com/bedrock/" target="_blank" rel="noopener">Amazon Bedrock</a></td><td>Claude, Llama, Mistral + fine-tuning + RAG</td></tr>
+<tr><td class="label">Azure</td><td><a href="https://azure.microsoft.com/products/ai-services/openai-service" target="_blank" rel="noopener">Azure OpenAI</a></td><td>GPT-4 on Azure, enterprise security, Copilot</td></tr>
+<tr><td class="label">Google Cloud</td><td><a href="https://cloud.google.com/vertex-ai" target="_blank" rel="noopener">Vertex AI</a></td><td>Gemini + open models + ML pipelines</td></tr>
+<tr><td class="label">Hugging Face</td><td><a href="https://huggingface.co" target="_blank" rel="noopener">Hub + Inference</a></td><td>Open model hub, 500K+ models, community</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ═══ 13: LEARNING PATH ═══ -->
+<section class="section fade-in" id="learn">
+<div class="section-tag" style="color:var(--green)">13 — Where to start learning</div>
+<h2>Your Learning Path</h2>
+<p class="lead">From "I know nothing" to "I can build agents" — pick your starting point.</p>
+
+<div class="callout amber" style="background:linear-gradient(135deg,rgba(240,160,64,0.08),rgba(240,160,64,0.02))">
+<div class="callout-title">🎯 The single most important rule: <em>learn AI by using AI</em></div>
+<p style="margin-top:.3rem">Courses and articles teach concepts. <strong>Daily use teaches capabilities and limitations.</strong> Pick a real problem from your work or life and try to solve it with Claude, ChatGPT, or Gemini <em>every single day</em>. Notice where the model shines and where it breaks. Each time you hit a wall, you'll naturally invent a workaround — better prompting, adding context, chaining steps, adding tools.</p>
+<p style="margin-top:.5rem">That's how everyone becomes genuinely productive with AI. No amount of theory replaces the intuition you build by using it on your actual problems. The people getting the most out of AI today aren't the ones who read the most papers — they're the ones who used it the most. In every industry, the individuals who figure out workarounds for today's AI limitations are the ones transforming their productivity and, eventually, their field.</p>
+</div>
+
+<h3 class="sub" style="color:var(--accent)">Stage 1 — Understand the Basics (Week 1–2)</h3>
+<div class="lp-track">
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-a);color:var(--accent)">📺</div><div class="lp-meta"><h4><a href="https://cloudskillsboost.google/course_templates/536" target="_blank">Google: Intro to Generative AI</a></h4><p>Free 1-hour course. Explains what Gen AI is, how LLMs work, and where they're used. Perfect starting point.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">1 hour</span><span class="lp-tag">No code</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-b);color:var(--blue)">📺</div><div class="lp-meta"><h4><a href="https://learn.microsoft.com/en-us/training/paths/get-started-with-artificial-intelligence-on-azure/" target="_blank">Microsoft: AI Fundamentals (AI-900 Path)</a></h4><p>Free learning path covering core AI principles, neural networks, and practical applications.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">1-2 hours</span><span class="lp-tag">Cert available</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-c);color:var(--cyan)">📺</div><div class="lp-meta"><h4><a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi" target="_blank">3Blue1Brown: Neural Networks (YouTube)</a></h4><p>Best visual explanation of how neural networks learn. Beautiful animations, builds intuition from scratch.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">~2 hours</span><span class="lp-tag">Visual math</span></div></div></div>
+</div>
+
+<h3 class="sub" style="color:var(--blue)">Stage 2 — Use AI Effectively (Week 2–4)</h3>
+<div class="lp-track">
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-b);color:var(--blue)">🛠️</div><div class="lp-meta"><h4><a href="https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/" target="_blank">DeepLearning.AI: Prompt Engineering for Devs</a></h4><p>90-min course by Andrew Ng & Isa Fulford. Prompt best practices with code examples using the OpenAI API.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">90 min</span><span class="lp-tag">Python basics</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-a);color:var(--accent)">🛠️</div><div class="lp-meta"><h4><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank">Anthropic Docs: Prompt Engineering</a></h4><p>Anthropic's official guide to building with Claude. Covers API, tool use, system prompts, and best practices.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">Self-paced</span><span class="lp-tag">Official</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-g);color:var(--green)">📖</div><div class="lp-meta"><h4><a href="https://www.promptingguide.ai/" target="_blank">Prompt Engineering Guide (promptingguide.ai)</a></h4><p>Comprehensive open-source reference: zero-shot, few-shot, chain-of-thought, ReAct, context engineering. Bookmark this.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">Reference</span><span class="lp-tag">Community</span></div></div></div>
+</div>
+
+<h3 class="sub" style="color:var(--green)">Stage 3 — Build with AI (Week 4–8)</h3>
+<div class="lp-track">
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-g);color:var(--green)">🔨</div><div class="lp-meta"><h4><a href="https://www.deeplearning.ai/short-courses/" target="_blank">DeepLearning.AI: Short Courses (RAG, Agents, LangChain)</a></h4><p>Free 1-2 hour courses on building RAG apps, agents, and tool-using LLMs. Hands-on Jupyter notebooks.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">1-2 hrs each</span><span class="lp-tag">Hands-on</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-p);color:var(--purple)">🔨</div><div class="lp-meta"><h4><a href="https://huggingface.co/learn/nlp-course" target="_blank">Hugging Face: NLP Course</a></h4><p>Free, comprehensive course on NLP and transformers. Goes deeper into model internals. Best for fine-tuning.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">In-depth</span><span class="lp-tag">Python + PyTorch</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-c);color:var(--cyan)">🔨</div><div class="lp-meta"><h4><a href="https://course.fast.ai/" target="_blank">fast.ai: Practical Deep Learning</a></h4><p>Jeremy Howard's legendary "top-down" course: build working models first, learn theory after. Best for engineers.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">7 weeks</span><span class="lp-tag">Python + Jupyter</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-a);color:var(--accent)">🔨</div><div class="lp-meta"><h4><a href="https://docs.boundaryml.com/home" target="_blank">BAML Docs: Getting Started</a></h4><p>Learn to build type-safe LLM functions with structured outputs. Playground for testing prompts directly in VS Code.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">Self-paced</span><span class="lp-tag">Multi-language</span></div></div></div>
+</div>
+
+<h3 class="sub" style="color:var(--purple)">Stage 4 — Go Deep (Ongoing)</h3>
+<div class="lp-track">
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-p);color:var(--purple)">🎓</div><div class="lp-meta"><h4><a href="https://www.youtube.com/@AndrejKarpathy" target="_blank">Andrej Karpathy: YouTube Lectures</a></h4><p>"Let's build GPT from scratch," "Intro to LLMs," 2025 year-in-review. Gold standard for understanding transformers from first principles.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">YouTube</span><span class="lp-tag">Advanced</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-a);color:var(--accent)">🎓</div><div class="lp-meta"><h4><a href="https://www.youtube.com/playlist?list=PLoROMvodv4rMFqRtEuo6SGjY4XbRIVRd4" target="_blank">Stanford CS224N: NLP with Deep Learning</a></h4><p>Full Stanford course on YouTube. Rigorous academic depth on attention, transformers, pretraining.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">University</span><span class="lp-tag">Math required</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-c);color:var(--cyan)">🎓</div><div class="lp-meta"><h4><a href="https://modelcontextprotocol.io/" target="_blank">MCP Official Docs & Spec</a></h4><p>The official Model Context Protocol specification. Learn to build MCP servers and understand the standard.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">Reference</span><span class="lp-tag">Protocol spec</span></div></div></div>
+<div class="lp-item"><div class="lp-icon" style="background:var(--glow-g);color:var(--green)">🎓</div><div class="lp-meta"><h4><a href="https://github.com/davidkimai/Context-Engineering" target="_blank">Context Engineering Handbook (GitHub)</a></h4><p>Open-source first-principles handbook for context engineering. Inspired by Karpathy. Covers design, orchestration, optimization.</p><div class="lp-tags"><span class="lp-tag">Free</span><span class="lp-tag">GitHub repo</span><span class="lp-tag">Community</span></div></div></div>
+</div>
+</section>
+
+<!-- ═══ 14: FOR SOFTWARE ENGINEERS ═══ -->
+<section class="section fade-in" id="for-engineers">
+<div class="section-tag" style="color:var(--cyan)">14 — For software engineers</div>
+<h2>Two High-Leverage Career Paths</h2>
+<p class="lead">If you're a software engineer wondering where to focus, the AI boom is creating two distinct high-demand tracks. Both are hiring aggressively, both will be central to every industry for the next decade, and both reward deep technical skill.</p>
+
+<div class="diagram-wrap">
+<div class="diagram-title">The AI Stack — where engineers fit</div>
+<div style="display:flex;flex-direction:column;gap:.4rem;max-width:560px;margin:0 auto">
+<div style="padding:.6rem .9rem;border-radius:8px;border:1.5px solid var(--accent);background:var(--glow-a);text-align:center;font-weight:600;font-size:.82rem">
+Applications &amp; Agents (vertical domains)
+<div style="font-size:.62rem;color:var(--text2);font-weight:400;margin-top:.15rem">AI Engineers build here ← Track 2</div>
+</div>
+<div style="padding:.6rem .9rem;border-radius:8px;border:1px solid var(--border2);background:var(--surface);text-align:center;font-size:.78rem">
+Frameworks (LangGraph, CrewAI, BAML, MCP servers)
+</div>
+<div style="padding:.6rem .9rem;border-radius:8px;border:1px solid var(--border2);background:var(--surface);text-align:center;font-size:.78rem">
+Foundation Models (Claude, GPT, Gemini, Llama)
+</div>
+<div style="padding:.6rem .9rem;border-radius:8px;border:1px solid var(--border2);background:var(--surface);text-align:center;font-size:.78rem">
+Training / Inference Runtimes (vLLM, TensorRT-LLM, Megatron)
+</div>
+<div style="padding:.6rem .9rem;border-radius:8px;border:1.5px solid var(--cyan);background:var(--glow-c);text-align:center;font-weight:600;font-size:.82rem">
+Hardware + Networking (GPUs, NVLink, InfiniBand, RoCE)
+<div style="font-size:.62rem;color:var(--text2);font-weight:400;margin-top:.15rem">AI Infra Engineers build here ← Track 1</div>
+</div>
+</div>
+</div>
+
+<!-- ─── TRACK 1 ─── -->
+<h3 class="sub" style="color:var(--cyan)">Track 1 — AI Infrastructure Engineering</h3>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:.8rem">The "picks and shovels" of the AI boom. Every frontier lab, every hyperscaler, and every serious AI startup is bottlenecked on infrastructure. If you enjoy systems programming, distributed systems, and making hardware sing, this is where the highest-impact (and highest-paid) work is — and the problems get harder every year as models scale.</p>
+
+<h4 style="font-family:'Fraunces',serif;font-size:.95rem;margin:1.2rem 0 .6rem;color:var(--text)">Foundational layers</h4>
+<div class="card-grid cols-2">
+<div class="card cyan"><div class="card-icon">🔧</div>
+<h3>Hardware &amp; Accelerators</h3>
+<p>Understand the silicon: <a href="https://www.nvidia.com/en-us/data-center/h200/" target="_blank" rel="noopener">NVIDIA H100/H200/B200</a>, <a href="https://www.nvidia.com/en-us/data-center/gb200-nvl72/" target="_blank" rel="noopener">GB200 NVL72</a>, upcoming Rubin/Vera, <a href="https://www.amd.com/en/products/accelerators/instinct/mi300.html" target="_blank" rel="noopener">AMD MI300X / MI325X / MI450X</a>, <a href="https://cloud.google.com/tpu" target="_blank" rel="noopener">Google TPU v5/v6</a>, <a href="https://aws.amazon.com/ai/machine-learning/trainium/" target="_blank" rel="noopener">AWS Trainium</a>/<a href="https://aws.amazon.com/ai/machine-learning/inferentia/" target="_blank" rel="noopener">Inferentia</a>. Know memory bandwidth, tensor cores, FP8/FP4 quantization, HBM3e/HBM4, and why GPU choice drives the entire cluster design.</p>
+<span class="tag">NVIDIA · AMD · TPU · Custom silicon</span>
+</div>
+<div class="card blue"><div class="card-icon">🌐</div>
+<h3>High-Performance Networking</h3>
+<p>Training a 400B+ model means moving terabytes of gradients between thousands of GPUs. You need: <a href="https://www.nvidia.com/en-us/networking/products/infiniband/" target="_blank" rel="noopener">InfiniBand</a> (NDR 400G, XDR 800G), RDMA, <a href="https://www.nvidia.com/en-us/networking/ethernet-adapters/" target="_blank" rel="noopener">ConnectX-7/8</a> NICs, <a href="https://enterprise-support.nvidia.com/s/article/roce-v2-considerations" target="_blank" rel="noopener">RoCE v2</a> on Ethernet, and <a href="https://www.nvidia.com/en-us/data-center/nvlink/" target="_blank" rel="noopener">NVLink/NVSwitch</a> for intra-node. Topology matters: fat-tree, rail-optimized, dragonfly. Latency in nanoseconds — not milliseconds.</p>
+<span class="tag">InfiniBand · RDMA · NVLink · RoCE</span>
+</div>
+<div class="card green"><div class="card-icon">☸️</div>
+<h3>Orchestration &amp; Scheduling</h3>
+<p><a href="https://kubernetes.io" target="_blank" rel="noopener">Kubernetes</a> with the <a href="https://github.com/NVIDIA/k8s-device-plugin" target="_blank" rel="noopener">NVIDIA GPU Operator</a> for inference, <a href="https://slurm.schedmd.com" target="_blank" rel="noopener">Slurm</a> or <a href="https://github.com/kubernetes-sigs/kueue" target="_blank" rel="noopener">Kueue</a> for batch training, <a href="https://ray.io" target="_blank" rel="noopener">Ray</a> for distributed Python. Gang scheduling, topology-aware placement, job preemption, and multi-tenant isolation are hard problems with real revenue impact.</p>
+<span class="tag">K8s · Slurm · Ray · Nomad</span>
+</div>
+<div class="card purple"><div class="card-icon">📊</div>
+<h3>Observability &amp; Reliability</h3>
+<p>GPU clusters fail constantly — a single flaky NIC can halt a training run worth millions. Instrument everything: <a href="https://prometheus.io" target="_blank" rel="noopener">Prometheus</a> + <a href="https://grafana.com" target="_blank" rel="noopener">Grafana</a>, <a href="https://github.com/NVIDIA/dcgm-exporter" target="_blank" rel="noopener">DCGM</a> for GPU health, <a href="https://opentelemetry.io" target="_blank" rel="noopener">OpenTelemetry</a> for tracing, <a href="https://github.com/NVIDIA/nccl" target="_blank" rel="noopener">NCCL</a> debugging, checkpoint/restart, and fault-tolerant training (see <a href="https://ai.meta.com/research/publications/the-llama-3-herd-of-models/" target="_blank" rel="noopener">Llama 3 paper's failure analysis</a> — 419 interruptions in 54 days).</p>
+<span class="tag">Prometheus · DCGM · OTel · NCCL</span>
+</div>
+</div>
+
+<h4 style="font-family:'Fraunces',serif;font-size:.95rem;margin:1.6rem 0 .6rem;color:var(--text)">Two distinct specializations: <span style="color:var(--cyan)">Training</span> vs <span style="color:var(--accent)">Inference</span></h4>
+<p style="color:var(--text2);font-size:.85rem;margin-bottom:.8rem">These look similar but are completely different disciplines with different bottlenecks, different hardware preferences, and increasingly different teams. Pick one to go deep in — or know both and be very rare.</p>
+
+<div class="card-grid cols-2">
+<div class="card cyan" style="border-left-width:4px"><div class="card-icon">🏗️</div>
+<h3>AI Model Training Infrastructure</h3>
+<p><strong>The challenge:</strong> Synchronously coordinate 10,000+ GPUs for weeks without the whole training run collapsing. Gradients, weights, optimizer states — all moving at line rate across a purpose-built network.</p>
+<p style="margin-top:.5rem"><strong>Key frameworks:</strong> <a href="https://github.com/NVIDIA/Megatron-LM" target="_blank" rel="noopener">Megatron-LM</a>, <a href="https://github.com/microsoft/DeepSpeed" target="_blank" rel="noopener">DeepSpeed</a>, <a href="https://pytorch.org/docs/stable/fsdp.html" target="_blank" rel="noopener">PyTorch FSDP</a>, <a href="https://github.com/NVIDIA/NeMo" target="_blank" rel="noopener">NeMo</a>, <a href="https://github.com/huggingface/nanotron" target="_blank" rel="noopener">Nanotron</a>. 3D parallelism = <strong>data parallel + tensor parallel + pipeline parallel</strong>, plus sequence / expert parallelism for MoE.</p>
+<p style="margin-top:.5rem"><strong>Specific challenges:</strong> communication overhead (AllReduce bottleneck), stragglers, hardware failures mid-run, gradient explosion, checkpoint I/O, MFU (Model FLOPs Utilization) optimization. A 1% MFU improvement on a $100M training run = $1M saved.</p>
+<span class="tag">Megatron · DeepSpeed · FSDP · 3D parallelism</span>
+</div>
+
+<div class="card amber" style="border-left-width:4px"><div class="card-icon">⚡</div>
+<h3>AI Model Inference Infrastructure</h3>
+<p><strong>The challenge:</strong> Serve millions of concurrent users with unpredictable request shapes, strict latency SLOs (TTFT, ITL), while keeping GPU utilization high and cost per token low. Volume is exploding faster than training.</p>
+<p style="margin-top:.5rem"><strong>Key frameworks:</strong> <a href="https://github.com/vllm-project/vllm" target="_blank" rel="noopener">vLLM</a>, <a href="https://github.com/NVIDIA/TensorRT-LLM" target="_blank" rel="noopener">TensorRT-LLM</a>, <a href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener">SGLang</a>, <a href="https://developer.nvidia.com/dynamo" target="_blank" rel="noopener">NVIDIA Dynamo</a>, <a href="https://github.com/triton-inference-server/server" target="_blank" rel="noopener">Triton Inference Server</a>, <a href="https://github.com/llm-d/llm-d" target="_blank" rel="noopener">llm-d</a>. Techniques: <a href="https://blog.vllm.ai/2023/06/20/vllm.html" target="_blank" rel="noopener">PagedAttention</a>, continuous batching, speculative decoding, prefix caching, quantization (INT8, FP8, FP4).</p>
+<p style="margin-top:.5rem"><strong>Every optimization = real $ saved.</strong> A 2× inference throughput gain on a production model can save millions per month.</p>
+<span class="tag">vLLM · TensorRT-LLM · SGLang · Dynamo</span>
+</div>
+</div>
+
+<div class="callout cyan" style="margin-top:1rem">
+<div class="callout-title">🔥 The prefill vs decode split — most important concept in modern inference</div>
+<p>LLM inference has <strong>two fundamentally different phases</strong> that most engineers lump together:</p>
+<p style="margin-top:.4rem"><strong>① Prefill</strong> — Process the entire input prompt at once. Massively parallel, <em>compute-bound</em>, FLOPs-limited. This is where the KV cache gets built. Determines <strong>TTFT</strong> (time-to-first-token).</p>
+<p style="margin-top:.3rem"><strong>② Decode</strong> — Generate tokens one at a time, autoregressively. Sequential, <em>memory-bandwidth-bound</em>, HBM-limited. Determines <strong>ITL</strong> (inter-token latency).</p>
+<p style="margin-top:.4rem">Running both on the same GPU causes brutal interference — prefill jobs starve decode batches, decode waits starve prefill. <strong>Disaggregated inference</strong> (<a href="https://docs.vllm.ai/en/latest/features/disagg_prefill/" target="_blank" rel="noopener">vLLM</a>, <a href="https://arxiv.org/abs/2401.09670" target="_blank" rel="noopener">DistServe</a>, <a href="https://developer.nvidia.com/dynamo" target="_blank" rel="noopener">NVIDIA Dynamo</a>) splits them across separate GPU pools — often H100s for compute-heavy prefill, H200s with more HBM for memory-bound decode. The KV cache is then shipped between them over high-speed interconnect (<a href="https://github.com/ai-dynamo/nixl" target="_blank" rel="noopener">NIXL</a>, RDMA). Real-world gains: 70%+ throughput improvements, ~90% faster TTFT. This is where a lot of 2026 inference engineering work is concentrated.</p>
+</div>
+
+<div class="card-grid cols-2">
+<div class="card" style="border-left:3px solid var(--pink)"><div class="card-icon" style="background:rgba(255,96,144,0.1);color:var(--pink)">💰</div>
+<h3>Why this track is a great bet</h3>
+<p>Models keep getting larger, inference demand is exponential, and there's a global shortage of engineers who can operate 10,000+ GPU clusters. Compensation at frontier labs is among the highest in tech. The work is durable — the physics of moving bits between accelerators doesn't get disrupted by the next model release. Every 6 months brings new hardware, new parallelism schemes, new bottlenecks to solve.</p>
+<span class="tag">Scarce skills · Durable demand</span>
+</div>
+<div class="card" style="border-left:3px solid var(--cyan)"><div class="card-icon" style="background:var(--glow-c);color:var(--cyan)">📡</div>
+<h3>Who to follow to learn this field</h3>
+<p><strong><a href="https://semianalysis.com" target="_blank" rel="noopener">SemiAnalysis</a></strong> (Dylan Patel) — the definitive research firm on AI hardware, datacenter economics, supply chain, and training cost analysis. 200K+ subscribers including every major AI lab. Also runs <strong><a href="https://inferencemax.semianalysis.com" target="_blank" rel="noopener">InferenceMAX / InferenceX</a></strong> (continuously updated open inference benchmark across all GPUs) and <strong>ClusterMAX</strong> (cluster performance research). Subscribe first — this is the single highest-signal source in the field.</p>
+<p style="margin-top:.4rem"><strong>Podcasts &amp; deep interviews:</strong> <a href="https://www.dwarkesh.com" target="_blank" rel="noopener">Dwarkesh Patel Podcast</a> (long-form AI/infra interviews), <a href="https://www.latent.space" target="_blank" rel="noopener">Latent Space</a> (swyx — engineering-focused AI), <a href="https://www.youtube.com/@Asianometry" target="_blank" rel="noopener">Asianometry</a> (semiconductor history &amp; business, YouTube).</p>
+<p style="margin-top:.4rem"><strong>Technical deep-dives:</strong> <a href="https://www.chipsandcheese.com" target="_blank" rel="noopener">Chips and Cheese</a> (microarchitecture reviews), <a href="https://horace.io/brrr_intro.html" target="_blank" rel="noopener">Making Deep Learning Go Brrrr</a> (Horace He), <a href="https://jax-ml.github.io/scaling-book/" target="_blank" rel="noopener">How to Scale Your Model</a> (Google DeepMind — free book), <a href="https://bentoml.com/llm/" target="_blank" rel="noopener">LLM Inference Handbook</a> (BentoML), the <a href="https://pytorch.org/blog/" target="_blank" rel="noopener">PyTorch blog</a>, and the <a href="https://developer.nvidia.com/blog/" target="_blank" rel="noopener">NVIDIA Developer blog</a>.</p>
+<p style="margin-top:.4rem"><strong>Landmark papers:</strong> <a href="https://ai.meta.com/research/publications/the-llama-3-herd-of-models/" target="_blank" rel="noopener">Llama 3 paper</a> (training infra reality check), <a href="https://arxiv.org/abs/2401.09670" target="_blank" rel="noopener">DistServe</a> (disaggregated serving), <a href="https://arxiv.org/abs/2407.00079" target="_blank" rel="noopener">Mooncake</a> (KVCache architecture).</p>
+<span class="tag">SemiAnalysis · InferenceMAX · Dwarkesh · Latent Space</span>
+</div>
+</div>
+
+<!-- ─── TRACK 2 ─── -->
+<h3 class="sub" style="color:var(--accent)">Track 2 — AI Engineering (Building Agents)</h3>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:.8rem">The "application layer" of AI. Every industry — legal, medical, finance, real estate, manufacturing, education, customer support — needs domain-specific agents that actually work in production. This is where your business-domain knowledge compounds with AI skills to create enormous leverage.</p>
+
+<div class="card-grid cols-2">
+<div class="card amber"><div class="card-icon">🏗️</div>
+<h3>Agent Design &amp; Orchestration</h3>
+<p>Master the patterns: ReAct loops, planner-executor, orchestrator-workers, multi-agent teams. Know when to use <a href="https://www.langchain.com/langgraph" target="_blank" rel="noopener">LangGraph</a> vs <a href="https://www.crewai.com" target="_blank" rel="noopener">CrewAI</a> vs writing your own loop. Design for graceful degradation, retries, and human-in-the-loop checkpoints. A great agent architect can save a company 100x the cost of a naive implementation.</p>
+<span class="tag">LangGraph · CrewAI · Custom loops</span>
+</div>
+<div class="card blue"><div class="card-icon">📚</div>
+<h3>Context Engineering &amp; RAG</h3>
+<p>As Karpathy put it, "the delicate art and science of filling the context window." Hybrid search, reranking, <a href="https://microsoft.github.io/graphrag/" target="_blank" rel="noopener">GraphRAG</a>, agentic search, memory design, prompt compaction. The difference between a demo that impresses and an agent that works in production is almost entirely here.</p>
+<span class="tag">RAG · Agentic search · Memory</span>
+</div>
+<div class="card cyan"><div class="card-icon">🔌</div>
+<h3>Integration Layer (MCP &amp; A2A)</h3>
+<p>Build <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP servers</a> that expose your company's data and APIs safely to any AI. Design <a href="https://a2a-protocol.org" target="_blank" rel="noopener">A2A-compatible agents</a> that can collaborate across vendor boundaries. OAuth flows, permission scoping, rate limits, audit logs — boring work that gates every enterprise AI deployment.</p>
+<span class="tag">MCP · A2A · OAuth · Permissions</span>
+</div>
+<div class="card green"><div class="card-icon">🧪</div>
+<h3>Evals, Observability &amp; Safety</h3>
+<p>Production agents need systematic eval pipelines — not vibes. <a href="https://www.langchain.com/langsmith" target="_blank" rel="noopener">LangSmith</a>, <a href="https://braintrust.dev" target="_blank" rel="noopener">Braintrust</a>, <a href="https://arize.com" target="_blank" rel="noopener">Arize</a> for tracing + offline eval. Design golden datasets, LLM-as-judge pipelines, regression tests. Security: prompt injection defenses, tool sandboxing, PII handling. The most valuable AI engineers are the ones who ship reliably.</p>
+<span class="tag">Evals · Tracing · Guardrails</span>
+</div>
+<div class="card purple"><div class="card-icon">🎯</div>
+<h3>Structured Outputs &amp; Reliability</h3>
+<p>LLMs are sloppy by default. Tools like <a href="https://boundaryml.com" target="_blank" rel="noopener">BAML</a>, <a href="https://github.com/instructor-ai/instructor" target="_blank" rel="noopener">Instructor</a>, and <a href="https://json-schema.org" target="_blank" rel="noopener">JSON Schema</a>-based function calling turn free-form text into reliable typed data. Retry policies, fallback models, schema validation — the engineering discipline that makes LLM output trustable for downstream systems.</p>
+<span class="tag">BAML · Instructor · Type safety</span>
+</div>
+<div class="card" style="border-left:3px solid var(--accent)"><div class="card-icon" style="background:var(--glow-a);color:var(--accent)">🚀</div>
+<h3>Using AI at every step</h3>
+<p>The highest-output engineers use AI throughout their workflow: <a href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener">Claude Code</a> or <a href="https://cursor.com" target="_blank" rel="noopener">Cursor</a> for building, AI for code review, AI for writing docs, AI for debugging, AI for learning new libraries. They're not "prompt engineers" — they're <em>AI-augmented engineers</em> who ship 3–5× more than their peers. Build this habit now.</p>
+<span class="tag">AI-native workflow · Multiplier</span>
+</div>
+</div>
+
+<!-- ─── COMPARISON ─── -->
+<h3 class="sub">Which track is right for you?</h3>
+<table class="comp-table">
+<thead><tr><th></th><th style="color:var(--cyan)">AI Infrastructure</th><th style="color:var(--accent)">AI Engineering</th></tr></thead>
+<tbody>
+<tr><td class="label">You love</td><td>Low-level systems, distributed computing, hardware, performance</td><td>Product building, APIs, user problems, domain workflows</td></tr>
+<tr><td class="label">Typical stack</td><td>C++/Rust/Go, CUDA, Kubernetes, NCCL, Linux internals</td><td>Python/TypeScript, LLM APIs, vector DBs, web frameworks</td></tr>
+<tr><td class="label">Day to day</td><td>Debug why training is 30% slower, tune NCCL topology, GPU failures</td><td>Ship agents that solve real user problems, iterate on prompts/evals</td></tr>
+<tr><td class="label">Who hires</td><td>Frontier labs, hyperscalers, AI chip companies, HPC orgs</td><td>Every company in every industry — the hiring pool is wider</td></tr>
+<tr><td class="label">Background fit</td><td>Systems, HPC, networking, SRE, performance engineering</td><td>Full-stack, backend, product engineering, domain expertise</td></tr>
+<tr><td class="label">10-year outlook</td><td>Exponentially growing demand as models and inference scale</td><td>Every industry will need this — from legal tech to robotics software</td></tr>
+</tbody>
+</table>
+
+<div class="callout cyan">
+<div class="callout-title">💡 You don't have to pick one forever</div>
+<p>Many of the best engineers move between these tracks. Infrastructure experience makes you a dramatically better AI engineer (you understand the physics of what's slow and expensive). Application experience makes you a better infrastructure engineer (you know what users actually need). Start with wherever your current skills overlap most — then deliberately stretch into the other as you grow.</p>
+</div>
+</section>
+
+<!-- ═══ 15: THE FUTURE ═══ -->
+<section class="section fade-in" id="future">
+<div class="section-tag" style="color:var(--purple)">15 — Where this is heading <span class="evolving">Evolving</span></div>
+<h2>From Agentic AI to Physical AI</h2>
+<p class="lead">We're in the <em>early</em> stage of agentic AI. What's happening in software today is a preview of what will happen in every industry over the coming decade.</p>
+
+<div class="diagram-wrap">
+<div class="diagram-title">AI's Evolution: From Text → Agents → Embodied Intelligence</div>
+<div class="h-flow">
+<div class="node" style="min-width:120px;border-color:var(--text3);background:var(--bg3)">
+<div style="font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace">2020–2023</div>
+<div style="margin-top:.2rem">Generative AI</div>
+<div style="font-size:.58rem;color:var(--text2);margin-top:.15rem">Text, images, code</div>
+</div>
+<span class="arrow">→</span>
+<div class="node highlight" style="min-width:120px">
+<div style="font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace">2024–2027</div>
+<div style="margin-top:.2rem">Agentic AI <span style="font-size:.55rem;color:var(--accent)">← we are here</span></div>
+<div style="font-size:.58rem;color:var(--text2);margin-top:.15rem">Reason · Act · Use tools</div>
+</div>
+<span class="arrow">→</span>
+<div class="node purple-hl" style="min-width:120px">
+<div style="font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace">2026–2030+</div>
+<div style="margin-top:.2rem">Physical / Embodied AI</div>
+<div style="font-size:.58rem;color:var(--text2);margin-top:.15rem">Robotics · Autonomous systems</div>
+</div>
+</div>
+</div>
+
+<h3 class="sub">The Pattern: Coding Agents Are the Canary</h3>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:.8rem">Software engineering is the first industry being transformed by AI agents — and it's happening in real time, so we can watch the pattern unfold. What's happening here will repeat in every other knowledge-work field.</p>
+
+<div class="key-points">
+<div class="kp"><span class="kp-num" style="color:var(--green)">↑</span><div class="kp-content"><strong>Massive productivity gains</strong> — Claude Code now powers 4% of all GitHub commits. Developers ship features in hours that used to take days. Code review, refactoring, test writing, docs — all dramatically faster.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--pink)">⚠</span><div class="kp-content"><strong>New challenges emerge</strong> — Security vulnerabilities in AI-generated code. Maintainability when the human never read half the code they shipped. Code review at scale when AI generates 10x the volume. Attribution and accountability. "Vibe coding" producing brittle systems.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--blue)">↻</span><div class="kp-content"><strong>New skills & roles appear</strong> — Prompt engineers, context engineers, AI-augmented developers, evals engineers, agent reliability engineers. The work changes shape: less line-by-line typing, more architecture, review, and judgment.</div></div>
+<div class="kp"><span class="kp-num" style="color:var(--accent)">🌱</span><div class="kp-content"><strong>The field grows, not shrinks</strong> — Cheaper software enables more software. New products become viable. Solo founders ship what used to require teams. Demand for <em>good</em> engineering judgment goes up, not down.</div></div>
+</div>
+
+<div class="callout blue">
+<div class="callout-title">🔁 History will repeat — in every field</div>
+<p>The same arc is coming for legal research, medical diagnostics, financial analysis, scientific research, creative work, customer operations, and more. Each field will see:</p>
+<p style="margin-top:.4rem">① A wave of productivity gains as AI agents automate the repetitive and tedious → ② A painful adjustment period with new failure modes, ethical questions, and regulatory gaps → ③ Emergence of new roles, new standards, and new kinds of work that didn't exist before → ④ Ultimately: more output, more opportunity, but requiring different skills.</p>
+<p style="margin-top:.4rem">If you work in any industry, the question isn't <em>whether</em> AI agents are coming for it — it's <em>when</em> and <em>how you position yourself</em> to ride the wave instead of being flattened by it.</p>
+</div>
+
+<h3 class="sub">The Next Frontier: Physical AI / Embodied AI</h3>
+<p style="color:var(--text2);font-size:.88rem;margin-bottom:.8rem">Beyond agents that live in software, the next phase brings AI into the physical world — robots, autonomous vehicles, drones, smart factories. Many researchers call 2026 the "GPT-3 moment" for robotics.</p>
+
+<div class="card-grid cols-2">
+<div class="card purple"><div class="card-icon">🤖</div>
+<h3>Vision-Language-Action Models</h3>
+<p>The new architecture powering physical AI. Models that perceive (vision), understand (language), and act (motion). Companies like Figure AI, Agility Robotics, and Tesla are training humanoids with these. Few-shot learning is reaching precision robotics — instead of months of programming, robots learn from a handful of demonstrations.</p>
+<span class="tag">VLA · Embodied reasoning</span>
+</div>
+<div class="card green"><div class="card-icon">🌐</div>
+<h3>World Models</h3>
+<p>AI systems that simulate how environments evolve. They let agents predict outcomes before acting — critical for robots, autonomous vehicles, and digital twins. Combined with reinforcement learning, they enable "learning by imagining" rather than learning only by doing.</p>
+<span class="tag">Simulation · Prediction</span>
+</div>
+<div class="card amber"><div class="card-icon">🏭</div>
+<h3>Industrial & Service Robots</h3>
+<p>Shipments of autonomous mobile robots are projected to grow 6× by 2030. Manufacturing, logistics, healthcare, and hospitality will all see robots co-reasoning alongside humans — flexible enough for low-volume, high-mix work that rigid automation could never handle.</p>
+<span class="tag">Near-term deployment</span>
+</div>
+<div class="card cyan"><div class="card-icon">🧬</div>
+<h3>Healthcare & Science</h3>
+<p>AI-assisted robotic surgery already reduces operative time ~25% and complications ~30%. Embodied AI research in healthcare grew 7× between 2019–2024. Labs are being automated, drug discovery accelerated, patient care augmented. The productivity boost to science could be civilization-scale.</p>
+<span class="tag">Transformative · Long-term</span>
+</div>
+</div>
+
+<div class="callout green">
+<div class="callout-title">🌟 The bottom line</div>
+<p>We're still in the <em>early innings</em> of the agentic AI wave — the space is evolving weekly, the industry is still solving basic limitations, and model capabilities keep increasing. Every limitation discussed in Section 4 is being actively chipped away at by frontier labs. What seems cutting-edge today will feel primitive in 18 months.</p>
+<p style="margin-top:.4rem">The playbook is simple: <strong>start now, use it daily, build real things, stay curious.</strong> The people building intuition today — by shipping projects, hitting walls, and inventing workarounds — are the ones who will shape how AI transforms their industries tomorrow.</p>
+</div>
+</section>
+
+<!-- ═══ 16: FLASHCARDS ═══ -->
+<section class="section fade-in" id="flashcards">
+<div class="section-tag" style="color:var(--accent)">16 — Test yourself</div>
+<h2>Flashcard Quiz</h2>
+<p class="lead">Click to flip. See how much you retained.</p>
+<div class="flashcard-deck">
+<div class="flashcard" id="fcCard" onclick="flipCard()">
+<span class="fc-label fc-q" id="fcLabel">QUESTION</span>
+<div class="fc-text" id="fcText"></div>
+<span class="fc-hint" id="fcHint">click to flip</span>
+</div>
+<div class="fc-nav">
+<button onclick="prevCard()">← Prev</button>
+<span class="fc-counter" id="fcCounter">1/35</span>
+<button onclick="nextCard()">Next →</button>
+</div>
+</div>
+</section>
+
+<!-- ═══ GLOSSARY ═══ -->
+<section class="section fade-in" id="glossary">
+<div class="section-tag" style="color:var(--text3)">Reference</div>
+<h2>Glossary</h2>
+<dl class="glossary">
+<div class="glossary-item"><dt>LLM</dt><dd>Large Language Model — neural network trained on text to generate language.</dd></div>
+<div class="glossary-item"><dt>Token</dt><dd>A chunk of text (~¾ of a word). Models process and price by tokens.</dd></div>
+<div class="glossary-item"><dt>Context Window</dt><dd>Total text a model can see at once, measured in tokens.</dd></div>
+<div class="glossary-item"><dt>Transformer</dt><dd>Architecture behind all modern LLMs. Uses attention mechanisms.</dd></div>
+<div class="glossary-item"><dt>Attention</dt><dd>Mechanism letting models weigh which input parts are most relevant.</dd></div>
+<div class="glossary-item"><dt>Pre-Training</dt><dd>Phase where a model learns language from massive datasets.</dd></div>
+<div class="glossary-item"><dt>SFT</dt><dd>Supervised Fine-Tuning — training on curated Q&A examples.</dd></div>
+<div class="glossary-item"><dt>RLHF</dt><dd>Reinforcement Learning from Human Feedback.</dd></div>
+<div class="glossary-item"><dt>RLVR</dt><dd>RL from Verifiable Rewards — alignment via automated checks.</dd></div>
+<div class="glossary-item"><dt>Embedding</dt><dd>Numerical vector representing text meaning. Similar = nearby.</dd></div>
+<div class="glossary-item"><dt>RAG</dt><dd>Retrieval-Augmented Generation — fetching docs for context.</dd></div>
+<div class="glossary-item"><dt>Hallucination</dt><dd>Plausible-sounding but factually wrong model output.</dd></div>
+<div class="glossary-item"><dt>Agent</dt><dd>Model + loop + tools + memory = autonomous system.</dd></div>
+<div class="glossary-item"><dt>MCP</dt><dd>Model Context Protocol — open standard for AI ↔ tool connections.</dd></div>
+<div class="glossary-item"><dt>A2A</dt><dd>Agent-to-Agent Protocol — open standard for agent ↔ agent comms.</dd></div>
+<div class="glossary-item"><dt>Agent Card</dt><dd>JSON file describing an A2A agent's capabilities & endpoint.</dd></div>
+<div class="glossary-item"><dt>BAML</dt><dd>Domain-specific language for type-safe structured LLM outputs.</dd></div>
+<div class="glossary-item"><dt>MoE</dt><dd>Mixture of Experts — routes inputs to specialized sub-networks.</dd></div>
+<div class="glossary-item"><dt>Function Calling</dt><dd>Model's ability to invoke external tools with formatted requests.</dd></div>
+<div class="glossary-item"><dt>Vector Database</dt><dd>DB optimized for storing/searching embeddings by similarity.</dd></div>
+<div class="glossary-item"><dt>Context Engineering</dt><dd>Curating everything a model sees to optimize output quality.</dd></div>
+<div class="glossary-item"><dt>Temperature</dt><dd>Parameter: 0 = deterministic, 1 = creative/random.</dd></div>
+<div class="glossary-item"><dt>Few-Shot</dt><dd>Providing examples in the prompt to teach a pattern.</dd></div>
+<div class="glossary-item"><dt>ReAct</dt><dd>Reason + Act pattern — the standard agent loop architecture.</dd></div>
+<div class="glossary-item"><dt>Prefill</dt><dd>Inference phase that processes the full input prompt in parallel. Compute-bound. Sets TTFT.</dd></div>
+<div class="glossary-item"><dt>Decode</dt><dd>Inference phase that generates tokens one-at-a-time. Memory-bandwidth-bound. Sets ITL.</dd></div>
+<div class="glossary-item"><dt>KV Cache</dt><dd>Cached key/value tensors from attention layers, reused during decode to avoid recomputation.</dd></div>
+<div class="glossary-item"><dt>TTFT / ITL</dt><dd>Time-To-First-Token / Inter-Token Latency — the two latency metrics that matter for inference.</dd></div>
+<div class="glossary-item"><dt>Disaggregated Serving</dt><dd>Running prefill and decode on separate GPU pools, shipping KV cache between them.</dd></div>
+<div class="glossary-item"><dt>3D Parallelism</dt><dd>Data + tensor + pipeline parallelism combined — how frontier models are trained across 1000s of GPUs.</dd></div>
+<div class="glossary-item"><dt>MFU</dt><dd>Model FLOPs Utilization — what % of a GPU's peak FLOPs your training run actually uses. Gold metric.</dd></div>
+</dl>
+</section>
+
+</main>
+
+<footer><div class="container">
+<p>AI Foundations Guide v2.0 · Built as a learning companion · Not affiliated with any AI lab</p>
+<p style="margin-top:.2rem">Sources: Anthropic, Andrej Karpathy, Google, DeepLearning.AI, Hugging Face, BoundaryML, and the broader AI community</p>
+</div></footer>
+
+<script>
+function navTo(id){const el=document.getElementById(id);if(el){window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-58,behavior:'smooth'})}return false}
+
+window.addEventListener('scroll',()=>{
+const h=document.documentElement.scrollHeight-window.innerHeight;
+document.getElementById('progressBar').style.width=(window.scrollY/h)*100+'%';
+const sects=document.querySelectorAll('.section[id]');let cur='';
+sects.forEach(s=>{if(window.scrollY>=s.offsetTop-120)cur=s.id});
+document.querySelectorAll('.nav-links a').forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+cur)});
+});
+
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:0.06});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+function showTab(gid,pid){const g=document.getElementById(gid);const c=g.parentElement;c.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));g.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(pid).classList.add('active');event.target.classList.add('active')}
+
+const flashcards=[
+{q:"What's the hierarchy: AI → ML → DL → Gen AI?",a:"Each is a subset: AI ⊃ Machine Learning ⊃ Deep Learning ⊃ Generative AI. Gen AI creates new content (text, images, code)."},
+{q:"What does an LLM fundamentally do?",a:"Predicts the next token given a sequence. It's a sophisticated pattern-matching engine trained on massive text data."},
+{q:"Name the 3 stages of building an LLM.",a:"1) Pre-training (learn language from huge datasets), 2) SFT (learn to follow instructions), 3) Alignment via RLHF or RLVR (learn to be safe and helpful)."},
+{q:"What is a Transformer?",a:"The neural network architecture behind all modern LLMs. Key innovation: the attention mechanism, which lets the model weigh which parts of input are most relevant."},
+{q:"What is hallucination?",a:"When a model generates plausible but factually wrong text. Happens because LLMs predict likely words, not true words."},
+{q:"What are the 4 core components of an AI agent?",a:"1) Model (brain), 2) Memory (short-term context + long-term storage), 3) Tools (search, APIs, code execution), 4) Loop/Orchestrator (drives the Reason→Act→Observe cycle)."},
+{q:"What is MCP and what does it solve?",a:"Model Context Protocol — an open standard by Anthropic. Standardizes how AI models connect to external tools and data. Solves the M×N integration problem by creating a universal interface."},
+{q:"What are the 3 MCP server capabilities?",a:"1) Resources (nouns — read-only data), 2) Tools (verbs — actions the model can invoke), 3) Prompts (templates — reusable prompt workflows)."},
+{q:"What is A2A and how does it differ from MCP?",a:"Agent-to-Agent Protocol by Google. MCP = agent ↔ tool communication. A2A = agent ↔ agent communication. They're complementary, not competing."},
+{q:"What is an Agent Card in A2A?",a:"A JSON file at /.well-known/agent.json describing an agent's name, capabilities, skills, supported modalities, auth requirements, and endpoint. Like a resume for discovery."},
+{q:"What is RAG?",a:"Retrieval-Augmented Generation — fetch relevant documents and insert them into the model's context before generating an answer. Grounds the model in your specific data."},
+{q:"Is RAG Phase 1 (indexing) done once?",a:"No! Indexing is continuous — re-runs when new data arrives via webhooks, schedules, or data change triggers. It's an ongoing pipeline, not a one-time setup."},
+{q:"Name 3 search types in RAG.",a:"1) Vector search (semantic similarity), 2) Keyword/BM25 (exact text match), 3) Hybrid + Rerank (combine both, then re-sort by relevance with a reranker model)."},
+{q:"What is context engineering?",a:"Curating everything a model sees — instructions, examples, retrieved docs, tool results, memory, state — to optimize output. Coined by Karpathy: 'filling the context window with the right info.'"},
+{q:"What is BAML?",a:"A domain-specific language by BoundaryML for getting structured outputs from LLMs. Write typed function contracts in .baml files, get type-safe clients for Python/TS/Ruby/Go. Uses Schema-Aligned Parsing."},
+{q:"Name 3 coding agents and their key difference.",a:"Claude Code (local, terminal, highest code quality), Codex (cloud + local, async tasks, most token-efficient), OpenCode (open-source, 75+ providers, maximum flexibility)."},
+{q:"What is OpenClaw?",a:"An open-source personal AI agent. Self-hosted, connects to 23+ messaging platforms (WhatsApp, Telegram, Slack). Has persistent memory, MCP support, 100+ skills, and proactive scheduling."},
+{q:"What makes personal agents different from chatbots?",a:"They're proactive (not just reactive), live in your messaging apps, have persistent memory across sessions, and connect to your real tools via MCP integrations."},
+{q:"What is RLVR and why was it a 2025 breakthrough?",a:"Reinforcement Learning from Verifiable Rewards. Uses automated checks (math, code tests) instead of human rankings. Cheaper, more scalable, dramatically improved reasoning. Pioneered by DeepSeek-R1."},
+{q:"What's the ReAct pattern?",a:"Reason → Act → Observe, in a loop. The model reasons about what to do, takes an action (calls a tool), observes the result, decides if more steps are needed. This gives agents iterative power."},
+{q:"What is a Mixture of Experts (MoE) model?",a:"Architecture with many specialized sub-networks ('experts'). Only a few activate per input, making the model faster and cheaper while maintaining quality. Examples: Llama 4 Scout, Qwen3-235B."},
+{q:"How do MCP and A2A work together in a multi-agent system?",a:"A2A handles agent discovery and task delegation between agents. Each agent uses MCP internally to connect to its own tools and data sources. A2A is the 'inter-agent bus'; MCP is the 'tool bus.'"},
+{q:"Where should a complete beginner start?",a:"Google's free 'Intro to Generative AI' (1hr), then 3Blue1Brown's neural network videos, then DeepLearning.AI's prompt engineering course by Andrew Ng."},
+{q:"What caution is needed with personal AI agents?",a:"Security risks (system access), malicious extensions, unintended actions (e.g., agents deleting data). Always use sandboxing, human-in-the-loop for consequential decisions, and vetted extensions."},
+{q:"What is Agentic Search and how does it differ from RAG?",a:"Agentic search = the agent explores at runtime using grep, glob, read (iteratively refining the query). RAG = single-shot retrieval from a pre-built vector index. Claude Code dropped RAG for agentic search because it's simpler, has no staleness, better privacy, and outperformed RAG in their tests."},
+{q:"What is GraphRAG and when should you use it?",a:"Microsoft's approach that extracts a knowledge graph (entities + relationships) from documents and queries across it. Handles multi-hop questions vector search can't answer. Best for legal, medical, enterprise knowledge work. LazyGraphRAG (March 2026) cut indexing costs significantly."},
+{q:"What's the single best way to learn AI?",a:"Use it daily on real problems from your work or life. Courses teach concepts; daily use teaches capabilities and limitations. Each time you hit a wall, you invent a workaround — that's how intuition builds."},
+{q:"What comes after agentic AI?",a:"Physical AI / Embodied AI — robotics, autonomous vehicles, drones. Powered by Vision-Language-Action (VLA) models and world models. Many call 2026 the 'GPT-3 moment' for robotics. The next decade will see AI move from software-only to physical interaction with the world."},
+{q:"How are coding agents a preview of what's coming to other fields?",a:"They show the pattern: (1) massive productivity gains, (2) new challenges emerge (security, maintainability, code-review-at-scale), (3) new roles appear (prompt/context engineers, eval engineers), (4) the field grows instead of shrinks. This same arc will play out in legal, medical, finance, research, creative work — every knowledge-work field."},
+{q:"What's the difference between prefill and decode in LLM inference?",a:"Prefill = processes the entire input prompt at once, compute-bound, determines TTFT (time-to-first-token). Decode = generates tokens one at a time autoregressively, memory-bandwidth-bound, determines ITL (inter-token latency). They're fundamentally different workloads that benefit from being run on different hardware — which is why disaggregated serving exists."},
+{q:"What is disaggregated serving and why does it matter?",a:"Splitting prefill and decode across separate GPU pools (e.g., H100s for compute-heavy prefill, H200s with more HBM for memory-bound decode), shipping the KV cache between them over RDMA/NVLink. Prevents the two workloads from interfering with each other. Real gains: 70%+ throughput improvements, ~90% faster TTFT. Implemented in vLLM, DistServe, NVIDIA Dynamo."},
+{q:"What are the two biggest specializations within AI infrastructure?",a:"(1) AI Model Training Infrastructure — coordinate 10K+ GPUs for weeks, 3D parallelism (data+tensor+pipeline), gradient sync, fault tolerance (Llama 3 had 419 interruptions in 54 days). (2) AI Model Inference Infrastructure — serve millions of users with strict latency SLOs, PagedAttention, continuous batching, speculative decoding, quantization. They share fundamentals but diverge quickly."},
+{q:"Who should you follow to learn AI infrastructure?",a:"SemiAnalysis (Dylan Patel) is the definitive source — runs InferenceMAX benchmark and ClusterMAX research. Also: Dwarkesh Patel podcast, Latent Space (swyx), Chips and Cheese, Asianometry (YouTube), Horace He's 'Making Deep Learning Go Brrrr', and Google DeepMind's 'How to Scale Your Model' free book."},
+{q:"What are the two high-leverage career paths for software engineers in AI?",a:"(1) AI Infrastructure Engineering — hardware, GPU clusters, networking (InfiniBand, NVLink), orchestration (K8s, Slurm), training/inference runtimes. (2) AI Engineering — building agents for specific domains, context engineering, RAG, evals, MCP/A2A integrations, using AI throughout your workflow. Infra = picks & shovels. Engineering = vertical applications."}
+];
+
+let fcIdx=0,fcFlipped=false;
+function renderCard(){const c=flashcards[fcIdx];document.getElementById('fcText').textContent=c.q;document.getElementById('fcText').className='fc-text';document.getElementById('fcLabel').textContent='QUESTION';document.getElementById('fcLabel').className='fc-label fc-q';document.getElementById('fcHint').textContent='click to flip';document.getElementById('fcCounter').textContent=`${fcIdx+1}/${flashcards.length}`;fcFlipped=false}
+function flipCard(){const c=flashcards[fcIdx];if(!fcFlipped){document.getElementById('fcText').textContent=c.a;document.getElementById('fcText').className='fc-text answer';document.getElementById('fcLabel').textContent='ANSWER';document.getElementById('fcLabel').className='fc-label fc-a';document.getElementById('fcHint').textContent='click to flip back';fcFlipped=true}else{renderCard()}}
+function nextCard(){fcIdx=(fcIdx+1)%flashcards.length;renderCard()}
+function prevCard(){fcIdx=(fcIdx-1+flashcards.length)%flashcards.length;renderCard()}
+renderCard();
+</script>
+</body>
+</html>
